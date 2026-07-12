@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 6%;
+    --foreground: 210 20% 96%;
+
+    --card: 220 18% 9%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 220 18% 9%;
+    --popover-foreground: 210 20% 96%;
+
+    --primary: 152 100% 60%;
+    --primary-foreground: 220 20% 6%;
+
+    --secondary: 220 16% 14%;
+    --secondary-foreground: 210 20% 96%;
+
+    --muted: 220 16% 14%;
+    --muted-foreground: 215 12% 65%;
+
+    --accent: 195 100% 62%;
+    --accent-foreground: 220 20% 6%;
+
+    --destructive: 356 100% 62%;
+    --destructive-foreground: 210 20% 96%;
+
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 152 100% 60%;
+
+    --radius: 0.9rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(57,210,255,0.10), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(57,255,136,0.06), transparent);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-emerald-300 to-accent;
+  }
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-white/5;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Tiptap editor styling for admin WYSIWYG */
+.tiptap-editor .ProseMirror {
+  min-height: 320px;
+  outline: none;
+}
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  height: 0;
+}
+.tiptap-editor .ProseMirror h1 { @apply text-2xl font-bold mt-4 mb-2; }
+.tiptap-editor .ProseMirror h2 { @apply text-xl font-bold mt-4 mb-2; }
+.tiptap-editor .ProseMirror h3 { @apply text-lg font-bold mt-3 mb-2; }
+.tiptap-editor .ProseMirror ul { @apply list-disc pl-6; }
+.tiptap-editor .ProseMirror ol { @apply list-decimal pl-6; }
+.tiptap-editor .ProseMirror a { @apply text-accent underline; }
+.tiptap-editor .ProseMirror img { @apply rounded-lg my-2 max-w-full; }
+.tiptap-editor .ProseMirror blockquote { @apply border-l-2 border-primary/50 pl-4 italic text-muted-foreground; }
+
+.prose-nfl {
+  @apply text-foreground/90 leading-relaxed;
+}
+.prose-nfl h2 { @apply text-2xl font-bold mt-8 mb-3 text-foreground; }
+.prose-nfl h3 { @apply text-xl font-bold mt-6 mb-2 text-foreground; }
+.prose-nfl p { @apply mb-4; }
+.prose-nfl ul { @apply list-disc pl-6 mb-4 space-y-1; }
+.prose-nfl ol { @apply list-decimal pl-6 mb-4 space-y-1; }
+.prose-nfl a { @apply text-accent underline underline-offset-2; }
+.prose-nfl img { @apply rounded-xl my-6; }
+.prose-nfl blockquote { @apply border-l-2 border-primary/50 pl-4 italic text-muted-foreground my-4; }
