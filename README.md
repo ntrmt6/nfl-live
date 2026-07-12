@@ -53,7 +53,19 @@ blog posts with the built-in WYSIWYG editor.
 
 1. Replace `public/ads.txt` with the exact snippet from your AdSense account.
 2. Set `NEXT_PUBLIC_ADSENSE_CLIENT` to your `ca-pub-...` ID — the script tag
-   is injected automatically in `src/app/layout.tsx`.
+   is injected by `src/components/AdSenseScript.tsx`.
+3. **The AdSense script is intentionally excluded from `/games/*` pages**
+   (see that file) — those pages host the click-to-redirect stream player,
+   and running Google ads alongside that interaction is the combination
+   most likely to trigger an AdSense policy review or account suspension.
+   Keep AdSense on genuine-content pages (home, blog, legal, contact) and
+   let the game pages monetize purely through the affiliate redirect.
+4. Before applying for AdSense, publish several real blog posts — reviewers
+   check for "sufficient original content" across the domain, and a site
+   that's only a schedule plus a stream page is a common rejection reason.
+5. Do not run a second ad network (especially popunder/push-notification
+   networks) on the same pages as AdSense; stacking ad networks like that
+   is a frequent cause of invalid-traffic suspensions.
 
 ## Monetization design note
 
