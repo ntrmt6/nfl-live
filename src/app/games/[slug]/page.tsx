@@ -9,7 +9,7 @@ import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
 import { formatGameTime, isLiveNow, absoluteUrl } from "@/lib/utils";
-import { breadcrumbSchema } from "@/lib/schema-org";
+import { sportsEventSchema, matchupPredictionSchema, breadcrumbSchema } from "@/lib/schema-org";
 
 export const revalidate = 60;
 
@@ -89,13 +89,14 @@ export default async function GamePage({
     { name: "Predictions", url: "/predictions" },
     { name: `${away.name} vs ${home.name}`, url: `/games/${game.slug}` },
   ]);
+  const eventSchema = sportsEventSchema({ ...game, kickoff: new Date(game.kickoff) } as any);
+  const predSchema = prediction ? matchupPredictionSchema({ ...game, kickoff: new Date(game.kickoff) } as any, prediction) : null;
 
   return (
     <div className="container py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }} />
+      {predSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(predSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
 
       <Link
         href="/predictions"

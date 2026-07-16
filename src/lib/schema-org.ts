@@ -1,5 +1,6 @@
 import { IGame } from "@/models/Game";
 import { IPost } from "@/models/Post";
+import { IPrediction } from "@/models/Prediction";
 import { absoluteUrl } from "@/lib/utils";
 import { getTeam } from "@/lib/teams";
 
@@ -13,6 +14,8 @@ export function organizationSchema() {
     name: SITE_NAME,
     url: SITE_URL,
     logo: absoluteUrl("/logo.png"),
+    description:
+      "NFL fan hub featuring AI-powered game predictions, full schedule, matchup analysis, team stats, and expert blog coverage.",
     sameAs: [],
   };
 }
@@ -23,6 +26,8 @@ export function websiteSchema() {
     "@type": "WebSite",
     name: SITE_NAME,
     url: SITE_URL,
+    description:
+      "AI-powered NFL predictions, full 2026 schedule, matchup breakdowns, and expert fan coverage.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${SITE_URL}/blog?q={search_term_string}`,
@@ -37,11 +42,11 @@ export function sportsEventSchema(game: IGame) {
   return {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
-    name: `${away.name} vs ${home.name}`,
+    name: `${away.name} vs ${home.name} – Week ${game.week} Prediction & Analysis`,
     alternateName: `${away.abbr} at ${home.abbr} Week ${game.week}`,
     startDate: new Date(game.kickoff).toISOString(),
     eventStatus: mapEventStatus(game.status),
-    eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: {
       "@type": "Place",
       name: game.venue || `${home.name} Stadium`,
@@ -65,8 +70,49 @@ export function sportsEventSchema(game: IGame) {
     },
     description:
       game.description ||
-      `Watch ${away.name} at ${home.name} live. Kickoff time, TV network (${game.network || "TBD"}), venue, and live stream coverage for NFL Week ${game.week}.`,
+      `AI-powered prediction and matchup analysis for ${away.name} at ${home.name}. ` +
+      `Win probabilities, key stats, and model breakdown for NFL Week ${game.week} ` +
+      `(${game.network || "TBD"}, ${game.venue || home.name + " Stadium"}).`,
     url: absoluteUrl(`/games/${game.slug}`),
+  };
+}
+
+export function matchupPredictionSchema(game: IGame, pred: IPrediction) {
+  const home = getTeam(game.homeTeam);
+  const away = getTeam(game.awayTeam);
+  const winner = pred.predictedWinner === game.homeTeam ? home.name : away.name;
+  return {
+    "@context": "https://schema.org",
+    "@type": "AnalysisNewsArticle",
+    headline: `${away.name} vs ${home.name} Week ${game.week} – AI Prediction & Matchup Breakdown`,
+    description:
+      `Our XGBoost model gives ${winner} a ${pred.confidence?.toFixed(0)}% confidence pick ` +
+      `(${away.name} ${(pred.awayWinProbability ?? 0).toFixed(0)}% / ${home.name} ${(pred.homeWinProbability ?? 0).toFixed(0)}% win probability). ` +
+      `Full stat comparison, radar chart, and key factor breakdown.`,
+    url: absoluteUrl(`/games/${game.slug}`),
+    dateModified: pred.generatedAt ? new Date(pred.generatedAt).toISOString() : undefined,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: absoluteUrl("/logo.png") },
+    },
+    about: [
+      { "@type": "SportsTeam", name: away.name, sport: "American Football" },
+      { "@type": "SportsTeam", name: home.name, sport: "American Football" },
+    ],
+    keywords: [
+      `${away.name} vs ${home.name} prediction`,
+      `NFL Week ${game.week} picks`,
+      `${away.name} ${home.name} odds`,
+      "NFL AI prediction",
+      "NFL matchup analysis",
+    ].join(", "),
   };
 }
 
@@ -91,7 +137,7 @@ export function blogPostingSchema(post: IPost) {
       ? [{ "@type": "ImageObject", url: post.coverImage, width: 1200, height: 675 }]
       : undefined,
     keywords: post.tags?.join(", "),
-    articleSection: "NFL Game Previews",
+    articleSection: "NFL Analysis",
     author: {
       "@type": "Organization",
       name: post.author,
@@ -121,13 +167,10 @@ export function blogPostingSchema(post: IPost) {
       url: `${SITE_URL}/blog`,
     },
     about: {
-      "@type": "SportsEvent",
+      "@type": "SportsOrganization",
+      name: "National Football League",
+      url: "https://www.nfl.com",
       sport: "American Football",
-      organizer: {
-        "@type": "Organization",
-        name: "National Football League",
-        url: "https://www.nfl.com",
-      },
     },
   };
 }
