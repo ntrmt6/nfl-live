@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { CalendarDays, Search } from "lucide-react";
+import { Search, ChevronDown, CalendarDays } from "lucide-react";
 import { GameCard } from "@/components/home/GameCard";
 import { Input } from "@/components/ui/input";
 import { TEAM_LIST } from "@/lib/teams";
@@ -12,6 +11,7 @@ import { cn } from "@/lib/utils";
 export function ScheduleGrid({ games }: { games: GameDTO[] }) {
   const [teamFilter, setTeamFilter] = useState<string>("ALL");
   const [query, setQuery] = useState("");
+  const [teamExpanded, setTeamExpanded] = useState(false);
 
   const weeks = useMemo(() => {
     const set = new Set(games.map((g) => g.week));
@@ -31,96 +31,129 @@ export function ScheduleGrid({ games }: { games: GameDTO[] }) {
   });
 
   return (
-    <section id="schedule" className="container py-16 scroll-mt-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div>
-          <div className="inline-flex items-center gap-2 text-xs font-semibold text-accent mb-2">
-            <CalendarDays className="h-4 w-4" />
-            GAME SCHEDULE
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Upcoming <span className="text-gradient">Matchups</span>
-          </h2>
+    <section id="schedule" className="scroll-mt-20">
+      {/* Compact header */}
+      <div className="flex items-center justify-between gap-4 mb-3">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-[#FF6200]" />
+          <span className="text-xs font-black uppercase tracking-widest text-[#FF6200]">
+            2026 NFL Schedule
+          </span>
+          <span className="text-[10px] text-muted-foreground font-medium">
+            {filtered.length} game{filtered.length !== 1 ? "s" : ""}
+          </span>
         </div>
-
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative w-44">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="Search teams..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9"
+            className="pl-8 h-7 text-xs"
           />
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-3 mb-2">
+      {/* Week filter tabs */}
+      <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-2 mb-2">
+        <button
+          onClick={() => setWeekFilter("ALL")}
+          className={cn(
+            "shrink-0 rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+            weekFilter === "ALL"
+              ? "bg-[#FF6200] text-white border-[#FF6200]"
+              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+          )}
+        >
+          All
+        </button>
         {weeks.map((w) => (
           <button
             key={w}
             onClick={() => setWeekFilter(w)}
             className={cn(
-              "shrink-0 rounded-full px-4 py-1.5 text-sm font-medium border transition-colors",
-              weekFilter === w
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Week {w}
-          </button>
-        ))}
-        <button
-          onClick={() => setWeekFilter("ALL")}
-          className={cn(
-            "shrink-0 rounded-full px-4 py-1.5 text-sm font-medium border transition-colors",
-            weekFilter === "ALL"
-              ? "bg-primary text-primary-foreground border-primary"
-              : "border-border text-muted-foreground hover:text-foreground"
-          )}
-        >
-          All Weeks
-        </button>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-6">
-        <button
-          onClick={() => setTeamFilter("ALL")}
-          className={cn(
-            "shrink-0 rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
-            teamFilter === "ALL"
-              ? "bg-accent text-accent-foreground border-accent"
-              : "border-border text-muted-foreground hover:text-foreground"
-          )}
-        >
-          All Teams
-        </button>
-        {TEAM_LIST.map((t) => (
-          <button
-            key={t.abbr}
-            onClick={() => setTeamFilter(t.abbr)}
-            className={cn(
               "shrink-0 rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
-              teamFilter === t.abbr
-                ? "text-black border-transparent"
-                : "border-border text-muted-foreground hover:text-foreground"
+              weekFilter === w
+                ? "bg-[#FF6200] text-white border-[#FF6200]"
+                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
             )}
-            style={teamFilter === t.abbr ? { backgroundColor: t.color } : undefined}
           >
-            {t.abbr}
+            Wk {w}
           </button>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-20 text-muted-foreground"
+      {/* Team filter — collapsible */}
+      <div className="mb-3">
+        <button
+          onClick={() => setTeamExpanded((v) => !v)}
+          className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors mb-1.5"
         >
-          No games match your filters. Try a different team or week.
-        </motion.div>
+          Filter by Team
+          <ChevronDown
+            className={cn(
+              "h-3.5 w-3.5 transition-transform duration-200",
+              teamExpanded && "rotate-180"
+            )}
+          />
+          {teamFilter !== "ALL" && (
+            <span
+              className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-black text-white"
+              style={{ background: "#FF6200" }}
+            >
+              {teamFilter}
+            </span>
+          )}
+        </button>
+
+        {teamExpanded && (
+          <div className="flex flex-wrap gap-1.5 pb-1">
+            <button
+              onClick={() => setTeamFilter("ALL")}
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-[11px] font-bold border transition-colors",
+                teamFilter === "ALL"
+                  ? "bg-[#FF6200] text-white border-[#FF6200]"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              ALL
+            </button>
+            {TEAM_LIST.map((t) => (
+              <button
+                key={t.abbr}
+                onClick={() => {
+                  setTeamFilter(t.abbr);
+                  setTeamExpanded(false);
+                }}
+                className={cn(
+                  "rounded-full px-2.5 py-0.5 text-[11px] font-bold border transition-colors",
+                  teamFilter === t.abbr
+                    ? "text-white border-transparent"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                )}
+                style={
+                  teamFilter === t.abbr
+                    ? { backgroundColor: t.color === "#000000" ? "#222" : t.color }
+                    : undefined
+                }
+              >
+                {t.abbr}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Results grid */}
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+          <CalendarDays className="h-10 w-10 mb-3 opacity-20" />
+          <p className="text-sm font-semibold">No games match your filters.</p>
+          <p className="text-xs mt-1">Try a different team or week.</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtered.map((game, i) => (
             <GameCard key={game._id} game={game} index={i} />
           ))}

@@ -123,22 +123,8 @@ const STREAMING_INFO: Record<string, {
   },
 };
 
-const PHOTO_IDS = [
-  "1566577739-9b9e57e6ef25","1508098682722-e99c43a406b2","1551958219-acbc595d1d96",
-  "1552667466-07770ae110d0","1614632537197-38a17061c2bd","1574629810360-7efbbe195018",
-  "1571019614242-c5c5dee9f50b","1600679472829-3044539781c8","1589487391730-58f20eb4d3f7",
-  "1504016798967-23c6e43e8c43","1541747618780-b0aecdc2e4ad","1519766304817-4f37bda74b28",
-  "1560272564-d83d04ed2ad6","1522778119026-1e67b3dab0a3","1526232761682-d26e03ac148e",
-  "1547347298-4074ad3086f0","1543351611-58f4e80d5c8f","1529900748604-07360bb6e596",
-  "1473492201326-7c01dd2e596b","1614271538965-8e28f0a7efec","1562552052-9de8f6f7f1f4",
-  "1624526267942-ab0ff8a3f972","1508701145011-f2c94cb4cb7e","1553772961-b1e94dc91f68",
-  "1535131749-80a3428b0a93","1612872087720-bb876e2e67d3","1631744853079-c17c98da7a1a",
-  "1578662996442-48f60103fc96","1600432589340-e5eb9b0cdba8","1555679486-4bf14b8f7c21",
-];
-
 function getPhotoUrl(away: string, home: string, week: number): string {
-  const seed = (away.charCodeAt(0) + home.charCodeAt(0) + week * 7) % PHOTO_IDS.length;
-  return `https://images.unsplash.com/photo-${PHOTO_IDS[seed]}?w=1200&h=675&fit=crop&auto=format`;
+  return `https://picsum.photos/seed/nfl-${away}-${home}-w${week}/1200/675`;
 }
 
 function isDivisionRival(a: string, b: string): boolean {

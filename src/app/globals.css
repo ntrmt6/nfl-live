@@ -4,78 +4,131 @@
 
 @layer base {
   :root {
-    --background: 220 20% 6%;
-    --foreground: 210 20% 96%;
+    --background: 224 22% 7%;
+    --foreground: 210 18% 94%;
 
-    --card: 220 18% 9%;
-    --card-foreground: 210 20% 96%;
+    --card: 222 22% 11%;
+    --card-foreground: 210 18% 94%;
 
-    --popover: 220 18% 9%;
-    --popover-foreground: 210 20% 96%;
+    --popover: 222 22% 11%;
+    --popover-foreground: 210 18% 94%;
 
-    --primary: 152 100% 60%;
-    --primary-foreground: 220 20% 6%;
+    --primary: 23 100% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 16% 14%;
-    --secondary-foreground: 210 20% 96%;
+    --secondary: 222 22% 15%;
+    --secondary-foreground: 210 18% 90%;
 
-    --muted: 220 16% 14%;
-    --muted-foreground: 215 12% 65%;
+    --muted: 222 20% 17%;
+    --muted-foreground: 218 12% 55%;
 
-    --accent: 195 100% 62%;
-    --accent-foreground: 220 20% 6%;
+    --accent: 204 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 356 100% 62%;
-    --destructive-foreground: 210 20% 96%;
+    --destructive: 356 82% 52%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
-    --ring: 152 100% 60%;
+    --border: 220 18% 18%;
+    --input: 220 18% 16%;
+    --ring: 23 100% 50%;
 
-    --radius: 0.9rem;
+    --radius: 0.375rem;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  html {
-    scroll-behavior: smooth;
-  }
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; }
   body {
     @apply bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(57,210,255,0.10), transparent),
-      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(57,255,136,0.06), transparent);
-    background-attachment: fixed;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+    -webkit-font-smoothing: antialiased;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-emerald-300 to-accent;
+    @apply bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #FF6200 0%, #FF8533 50%, #00A8FF 100%);
   }
+  .text-orange { color: #FF6200; }
+  .text-crystal-blue { color: #00A8FF; }
+
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-white/5;
+    background: hsl(222 22% 11% / 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid hsl(220 18% 18%);
   }
+
+  /* Section labels — ESPN-style ALL CAPS */
+  .section-label {
+    @apply text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground;
+  }
+  .section-label-orange {
+    @apply text-[10px] font-black uppercase tracking-[0.12em];
+    color: #FF6200;
+  }
+  .section-label-blue {
+    @apply text-[10px] font-black uppercase tracking-[0.12em];
+    color: #00A8FF;
+  }
+
+  /* Live badge dot */
+  .live-pulse {
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse;
+  }
+
+  /* ESPN data tables */
+  .data-grid { @apply w-full text-xs border-collapse; }
+  .data-grid thead tr { @apply border-b-2 border-border; }
+  .data-grid thead th {
+    @apply py-1.5 px-2 text-left font-bold uppercase tracking-wide text-muted-foreground;
+    font-size: 10px;
+  }
+  .data-grid thead th.sorted { color: #FF6200; }
+  .data-grid tbody tr {
+    @apply border-b border-border/30 transition-colors;
+  }
+  .data-grid tbody tr:nth-child(even) { background: hsl(222 22% 9%); }
+  .data-grid tbody tr:hover { background: hsl(222 22% 14%); }
+  .data-grid tbody td { @apply py-1.5 px-2 tabular-nums; }
+  .data-grid .playoff-team { color: #00A8FF; font-weight: 600; }
+  .data-grid .live-row { background: rgba(255, 98, 0, 0.08) !important; }
+  .data-grid .live-row td:first-child { border-left: 2px solid #FF6200; }
+
+  /* Ticker */
+  .ticker-wrap { overflow: hidden; }
+  .ticker-track { display: flex; width: max-content; }
+  .ticker-track:hover { animation-play-state: paused; }
+
+  /* Input */
   .input-field {
-    @apply w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all;
+    @apply w-full rounded border border-border bg-secondary/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all;
   }
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
+
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Card hover */
+  .card-hover {
+    @apply transition-all duration-200 hover:border-primary/30 hover:-translate-y-0.5;
+    box-shadow: 0 0 0 0 transparent;
   }
-  .scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .card-hover:hover {
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,98,0,0.15);
   }
 }
 
-/* Tiptap editor styling for admin WYSIWYG */
-.tiptap-editor .ProseMirror {
-  min-height: 320px;
-  outline: none;
+/* Ticker animation */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
+.animate-ticker { animation: ticker-scroll 90s linear infinite; }
+
+/* Tiptap editor */
+.tiptap-editor .ProseMirror { min-height: 320px; outline: none; }
 .tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -92,14 +145,16 @@
 .tiptap-editor .ProseMirror img { @apply rounded-lg my-2 max-w-full; }
 .tiptap-editor .ProseMirror blockquote { @apply border-l-2 border-primary/50 pl-4 italic text-muted-foreground; }
 
-.prose-nfl {
-  @apply text-foreground/90 leading-relaxed;
-}
+/* Blog prose */
+.prose-nfl { @apply text-foreground/90 leading-relaxed; }
 .prose-nfl h2 { @apply text-2xl font-bold mt-8 mb-3 text-foreground; }
 .prose-nfl h3 { @apply text-xl font-bold mt-6 mb-2 text-foreground; }
 .prose-nfl p { @apply mb-4; }
 .prose-nfl ul { @apply list-disc pl-6 mb-4 space-y-1; }
 .prose-nfl ol { @apply list-decimal pl-6 mb-4 space-y-1; }
-.prose-nfl a { @apply text-accent underline underline-offset-2; }
+.prose-nfl a { color: #00A8FF; @apply underline underline-offset-2; }
 .prose-nfl img { @apply rounded-xl my-6; }
 .prose-nfl blockquote { @apply border-l-2 border-primary/50 pl-4 italic text-muted-foreground my-4; }
+.prose-nfl section h2 { @apply text-2xl font-bold mt-8 mb-4; }
+.prose-nfl section h3 { @apply text-base font-semibold mt-4 mb-1; color: #00A8FF; }
+.prose-nfl strong { @apply font-bold text-foreground; }
