@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PostDTO } from "@/types";
+import { extractTeamsFromText } from "@/lib/teams";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 
 function tagColor(tag: string): { bg: string; text: string } {
   const t = tag.toLowerCase();
@@ -34,6 +36,8 @@ export function BlogCard({
     year: "numeric",
   });
 
+  const teams = extractTeamsFromText(post.title, post.tags?.join(" ") ?? "");
+
   if (compact) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
@@ -47,6 +51,12 @@ export function BlogCard({
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
+            ) : teams.length > 0 ? (
+              <div className="h-full w-full flex items-center justify-center gap-1 bg-secondary">
+                {teams.slice(0, 2).map((abbr) => (
+                  <TeamLogo key={abbr} abbr={abbr} size={28} />
+                ))}
+              </div>
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
             )}
@@ -74,7 +84,7 @@ export function BlogCard({
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <article className="h-full bg-card border border-border rounded card-hover overflow-hidden">
-        {/* Cover image */}
+        {/* Cover image / team logos fallback */}
         <div className="relative aspect-[16/9] bg-secondary overflow-hidden">
           {post.coverImage ? (
             <Image
@@ -83,6 +93,12 @@ export function BlogCard({
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
+          ) : teams.length > 0 ? (
+            <div className="h-full w-full flex items-center justify-center gap-4 bg-gradient-to-br from-secondary to-secondary/60">
+              {teams.slice(0, 2).map((abbr) => (
+                <TeamLogo key={abbr} abbr={abbr} size={56} className="drop-shadow-lg" />
+              ))}
+            </div>
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
           )}
@@ -104,10 +120,19 @@ export function BlogCard({
           <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
             {post.excerpt}
           </p>
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-            <span className="font-medium">{post.author}</span>
-            <span className="text-border">·</span>
-            <span>{dateStr}</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <span className="font-medium">{post.author}</span>
+              <span className="text-border">·</span>
+              <span>{dateStr}</span>
+            </div>
+            {teams.length > 0 && (
+              <div className="flex items-center gap-1">
+                {teams.slice(0, 2).map((abbr) => (
+                  <TeamLogo key={abbr} abbr={abbr} size={20} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </article>

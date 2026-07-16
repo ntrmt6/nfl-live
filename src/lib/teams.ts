@@ -54,3 +54,14 @@ export function getTeam(abbr: string): TeamInfo {
 }
 
 export const TEAM_LIST = Object.values(TEAMS);
+
+export function extractTeamsFromText(...texts: string[]): string[] {
+  const combined = texts.join(" ").toLowerCase();
+  const found: string[] = [];
+  for (const team of TEAM_LIST) {
+    if (combined.includes(team.name.toLowerCase())) {
+      found.push(team.abbr);
+    }
+  }
+  return found;
+}

@@ -7,6 +7,8 @@ import { getPostBySlug, getAllPostSlugs } from "@/lib/data/posts";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { blogPostingSchema, breadcrumbSchema } from "@/lib/schema-org";
 import { absoluteUrl } from "@/lib/utils";
+import { extractTeamsFromText } from "@/lib/teams";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 
 export const revalidate = 60;
 
@@ -75,6 +77,8 @@ export default async function BlogPostPage({
     } catch {}
   }
 
+  const teams = extractTeamsFromText(post.title, post.tags?.join(" ") ?? "");
+
   return (
     <article className="container py-10 max-w-3xl">
       <script
@@ -111,6 +115,17 @@ export default async function BlogPostPage({
           </span>
         ))}
       </div>
+
+      {teams.length > 0 && (
+        <div className="flex items-center gap-3 mb-4">
+          {teams.slice(0, 2).map((abbr, i) => (
+            <div key={abbr} className="flex items-center gap-2">
+              {i > 0 && <span className="text-muted-foreground/40 font-bold text-sm">vs</span>}
+              <TeamLogo abbr={abbr} size={40} className="drop-shadow" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{post.title}</h1>
 
