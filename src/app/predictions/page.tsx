@@ -5,9 +5,8 @@ import { getTeam } from "@/lib/teams";
 import { absoluteUrl } from "@/lib/utils";
 import { PredictionsRefreshButton } from "@/components/predictions/PredictionsRefreshButton";
 import { OverviewCharts } from "@/components/predictions/OverviewCharts";
-import { WinProbBar } from "@/components/predictions/WinProbBar";
-import { StatCompareBar } from "@/components/predictions/StatCompareBar";
-import { Brain, Calendar, Trophy, ChevronRight, Activity } from "lucide-react";
+import { PredictionCard } from "@/components/predictions/PredictionCard";
+import { Brain, Trophy, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -33,137 +32,6 @@ async function getPredictions() {
   } catch {
     return { predictions: [], meta: null };
   }
-}
-
-function TeamBadge({
-  abbr,
-  fullName,
-  side,
-  isWinner,
-}: {
-  abbr: string;
-  fullName: string;
-  side: "home" | "away";
-  isWinner: boolean;
-}) {
-  const team = getTeam(abbr);
-  return (
-    <div className={`flex flex-col items-center gap-2 flex-1 ${side === "home" ? "items-end" : "items-start"}`}>
-      <div
-        className="h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black text-white shadow-lg ring-2 ring-white/10"
-        style={{
-          background: `linear-gradient(135deg, ${team.color}, ${team.colorTo || team.color + "99"})`,
-          boxShadow: isWinner ? `0 0 16px ${team.color}55` : undefined,
-        }}
-      >
-        {abbr.slice(0, 3)}
-      </div>
-      <div className={`${side === "home" ? "text-right" : "text-left"}`}>
-        <p className={`text-[10px] font-semibold uppercase tracking-wide ${isWinner ? "text-[#FF6200]" : "text-muted-foreground"}`}>
-          {side === "away" ? "Away" : "Home"} {isWinner ? "· Pick ✓" : ""}
-        </p>
-        <p className={`text-sm font-bold leading-tight ${isWinner ? "text-white" : "text-foreground/70"}`}>
-          {fullName}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function PredictionCard({ pred, rank }: { pred: IPrediction; rank?: number }) {
-  const homeWin = pred.homeTeam === pred.predictedWinner;
-  const kickoff = pred.kickoff ? new Date(pred.kickoff) : null;
-  const confidence = pred.confidence ?? 50;
-  const isHighConf = confidence >= 75;
-
-  return (
-    <div className={`rounded-xl border bg-surface overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 ${
-      isHighConf ? "border-[#FF6200]/30 hover:border-[#FF6200]/60" : "border-border hover:border-border/80"
-    }`}>
-      {/* top accent line */}
-      <div
-        className="h-0.5 w-full"
-        style={{
-          background: isHighConf
-            ? "linear-gradient(90deg, #FF6200, #FF8C00)"
-            : "linear-gradient(90deg, #252d3d, #252d3d)",
-        }}
-      />
-
-      {/* header row */}
-      <div className="flex items-center justify-between px-4 py-2 bg-black/20">
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
-          {rank && (
-            <span className="inline-flex items-center justify-center h-4 w-4 rounded bg-[#FF6200]/20 text-[#FF6200] font-black">
-              {rank}
-            </span>
-          )}
-          <Calendar className="h-3 w-3" />
-          <span>Wk {pred.week}</span>
-          {kickoff && (
-            <span>
-              · {kickoff.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-            </span>
-          )}
-        </div>
-
-        {/* confidence pill */}
-        <div
-          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide border ${
-            confidence >= 80
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
-              : confidence >= 65
-              ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
-              : "bg-slate-600/20 text-slate-400 border-slate-600/25"
-          }`}
-        >
-          <Activity className="h-2.5 w-2.5" />
-          {confidence.toFixed(0)}% conf
-        </div>
-      </div>
-
-      {/* teams */}
-      <div className="px-4 pt-4 pb-3">
-        <div className="flex items-start gap-3 mb-4">
-          <TeamBadge
-            abbr={pred.awayTeam!}
-            fullName={pred.awayTeamFull!}
-            side="away"
-            isWinner={!homeWin}
-          />
-          <div className="shrink-0 pt-3 text-center">
-            <span className="text-lg font-black text-muted-foreground/30">@</span>
-          </div>
-          <TeamBadge
-            abbr={pred.homeTeam!}
-            fullName={pred.homeTeamFull!}
-            side="home"
-            isWinner={homeWin}
-          />
-        </div>
-
-        {/* tug-of-war prob bar */}
-        <WinProbBar
-          homeTeam={pred.homeTeam!}
-          awayTeam={pred.awayTeam!}
-          homeWinPct={pred.homeWinProbability ?? 50}
-          awayWinPct={pred.awayWinProbability ?? 50}
-        />
-      </div>
-
-      {/* stat compare */}
-      {pred.homeTeamStats && pred.awayTeamStats && (
-        <div className="px-4 pb-4 border-t border-border/40 pt-3 mt-1">
-          <StatCompareBar
-            homeTeam={pred.homeTeam!}
-            awayTeam={pred.awayTeam!}
-            homeStats={pred.homeTeamStats}
-            awayStats={pred.awayTeamStats}
-          />
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default async function PredictionsPage() {
