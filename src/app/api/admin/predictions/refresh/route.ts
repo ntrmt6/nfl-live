@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/requireAdmin";
 import { exec } from "child_process";
 import path from "path";
 
 export async function POST() {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const scriptPath = path.join(process.cwd(), "scripts", "ml_predictor.py");
 

@@ -6,7 +6,7 @@ import { absoluteUrl } from "@/lib/utils";
 import { PredictionsRefreshButton } from "@/components/predictions/PredictionsRefreshButton";
 import { Brain, TrendingUp, Target, BarChart3, Calendar, Zap } from "lucide-react";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "NFL Game Predictions | AI-Powered Win Probabilities",
