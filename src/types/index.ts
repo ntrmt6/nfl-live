@@ -31,6 +31,7 @@ export interface PostDTO {
   published: boolean;
   metaTitle?: string;
   metaDescription?: string;
+  schemaMarkup?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -12,6 +12,7 @@ export interface IPost {
   published: boolean;
   metaTitle?: string;
   metaDescription?: string;
+  schemaMarkup?: string; // JSON string for additional JSON-LD (FAQPage, SportsEvent, etc.)
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,6 +29,7 @@ const PostSchema = new Schema<IPost>(
     published: { type: Boolean, default: false },
     metaTitle: { type: String },
     metaDescription: { type: String },
+    schemaMarkup: { type: String },
   },
   { timestamps: true }
 );

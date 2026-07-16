@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, User, ChevronLeft } from "lucide-react";
 import { getPostBySlug, getAllPostSlugs } from "@/lib/data/posts";
+import { CommentSection } from "@/components/comments/CommentSection";
 import { blogPostingSchema, breadcrumbSchema } from "@/lib/schema-org";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -66,6 +67,14 @@ export default async function BlogPostPage({
     { name: post.title, url: `/blog/${post.slug}` },
   ]);
 
+  let extraSchemas: object[] = [];
+  if (post.schemaMarkup) {
+    try {
+      const parsed = JSON.parse(post.schemaMarkup);
+      extraSchemas = Array.isArray(parsed) ? parsed : [parsed];
+    } catch {}
+  }
+
   return (
     <article className="container py-10 max-w-3xl">
       <script
@@ -76,6 +85,13 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
+      {extraSchemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
 
       <Link
         href="/blog"
@@ -120,6 +136,10 @@ export default async function BlogPostPage({
       )}
 
       <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+      <div className="mt-12 pt-8 border-t border-border">
+        <CommentSection postSlug={slug} />
+      </div>
     </article>
   );
 }

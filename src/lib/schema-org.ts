@@ -91,6 +91,7 @@ export function blogPostingSchema(post: IPost) {
       ? [{ "@type": "ImageObject", url: post.coverImage, width: 1200, height: 675 }]
       : undefined,
     keywords: post.tags?.join(", "),
+    articleSection: "NFL Game Previews",
     author: {
       "@type": "Organization",
       name: post.author,
@@ -119,6 +120,30 @@ export function blogPostingSchema(post: IPost) {
       name: `${SITE_NAME} Blog`,
       url: `${SITE_URL}/blog`,
     },
+    about: {
+      "@type": "SportsEvent",
+      sport: "American Football",
+      organizer: {
+        "@type": "Organization",
+        name: "National Football League",
+        url: "https://www.nfl.com",
+      },
+    },
+  };
+}
+
+export function faqPageSchema(faqs: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
   };
 }
 
