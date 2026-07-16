@@ -4,14 +4,17 @@ import Prediction, { IPrediction } from "@/models/Prediction";
 import { getTeam } from "@/lib/teams";
 import { absoluteUrl } from "@/lib/utils";
 import { PredictionsRefreshButton } from "@/components/predictions/PredictionsRefreshButton";
-import { Brain, TrendingUp, Target, BarChart3, Calendar, Zap } from "lucide-react";
+import { OverviewCharts } from "@/components/predictions/OverviewCharts";
+import { WinProbBar } from "@/components/predictions/WinProbBar";
+import { StatCompareBar } from "@/components/predictions/StatCompareBar";
+import { Brain, Calendar, Trophy, ChevronRight, Activity } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "NFL Game Predictions | AI-Powered Win Probabilities",
+  title: "NFL Game Predictions | AI Win Probabilities",
   description:
-    "Machine learning predictions for upcoming NFL games. XGBoost model trained on 4 seasons of EPA and team efficiency data. Win probabilities, confidence scores, and model analytics.",
+    "XGBoost-powered NFL win probability predictions. Trained on 4 seasons of game data with rolling team efficiency features and zero data leakage.",
   alternates: { canonical: absoluteUrl("/predictions") },
 };
 
@@ -22,7 +25,7 @@ async function getPredictions() {
     const [predictions, meta] = await Promise.all([
       Prediction.find({ _type: { $exists: false }, kickoff: { $gte: now } })
         .sort({ kickoff: 1 })
-        .limit(64)
+        .limit(272)
         .lean(),
       Prediction.findOne({ _type: "model_meta" }).lean(),
     ]);
@@ -32,152 +35,131 @@ async function getPredictions() {
   }
 }
 
-function ConfidenceBadge({ confidence }: { confidence: number }) {
-  const label = confidence >= 75 ? "High" : confidence >= 60 ? "Medium" : "Low";
-  const cls =
-    confidence >= 75
-      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-      : confidence >= 60
-      ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-      : "bg-slate-500/15 text-slate-400 border-slate-500/30";
-  return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cls}`}>
-      <Zap className="h-2.5 w-2.5" />
-      {label} ({confidence.toFixed(0)}%)
-    </span>
-  );
-}
-
-function ProbBar({ pct, color }: { pct: number; color: string }) {
-  return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
-      <div
-        className="h-full rounded-full transition-all duration-700"
-        style={{ width: `${pct}%`, background: color }}
-      />
-    </div>
-  );
-}
-
-function TeamBlock({
+function TeamBadge({
   abbr,
   fullName,
-  winPct,
-  isWinner,
   side,
+  isWinner,
 }: {
   abbr: string;
   fullName: string;
-  winPct: number;
-  isWinner: boolean;
   side: "home" | "away";
+  isWinner: boolean;
 }) {
   const team = getTeam(abbr);
   return (
-    <div className={`flex flex-col gap-2 flex-1 ${side === "away" ? "items-start" : "items-end"}`}>
-      <div className={`flex items-center gap-2.5 ${side === "away" ? "" : "flex-row-reverse"}`}>
-        {/* Team color dot */}
-        <div
-          className="h-8 w-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white shadow"
-          style={{ background: `linear-gradient(135deg, ${team.color}, ${team.colorTo || team.color})` }}
-        >
-          {abbr.slice(0, 3)}
-        </div>
-        <div className={side === "away" ? "text-left" : "text-right"}>
-          <p className={`text-xs font-semibold uppercase tracking-wide ${isWinner ? "text-white" : "text-muted-foreground"}`}>
-            {side === "away" ? "Away" : "Home"}
-          </p>
-          <p className={`text-sm font-bold leading-tight ${isWinner ? "text-white" : "text-muted-foreground"}`}>
-            {fullName || team.name}
-          </p>
-        </div>
+    <div className={`flex flex-col items-center gap-2 flex-1 ${side === "home" ? "items-end" : "items-start"}`}>
+      <div
+        className="h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black text-white shadow-lg ring-2 ring-white/10"
+        style={{
+          background: `linear-gradient(135deg, ${team.color}, ${team.colorTo || team.color + "99"})`,
+          boxShadow: isWinner ? `0 0 16px ${team.color}55` : undefined,
+        }}
+      >
+        {abbr.slice(0, 3)}
       </div>
-
-      <div className={`w-full ${side === "away" ? "" : ""}`}>
-        <ProbBar pct={winPct} color={team.color || "#FF6200"} />
-        <p className={`mt-1 text-xs font-bold ${isWinner ? "text-white" : "text-muted-foreground"} ${side === "away" ? "text-left" : "text-right"}`}>
-          {winPct.toFixed(1)}%
+      <div className={`${side === "home" ? "text-right" : "text-left"}`}>
+        <p className={`text-[10px] font-semibold uppercase tracking-wide ${isWinner ? "text-[#FF6200]" : "text-muted-foreground"}`}>
+          {side === "away" ? "Away" : "Home"} {isWinner ? "· Pick ✓" : ""}
+        </p>
+        <p className={`text-sm font-bold leading-tight ${isWinner ? "text-white" : "text-foreground/70"}`}>
+          {fullName}
         </p>
       </div>
     </div>
   );
 }
 
-function PredictionCard({ pred }: { pred: IPrediction }) {
+function PredictionCard({ pred, rank }: { pred: IPrediction; rank?: number }) {
   const homeWin = pred.homeTeam === pred.predictedWinner;
   const kickoff = pred.kickoff ? new Date(pred.kickoff) : null;
+  const confidence = pred.confidence ?? 50;
+  const isHighConf = confidence >= 75;
 
   return (
-    <div className="rounded-xl border border-border bg-surface overflow-hidden hover:border-[#FF6200]/40 transition-colors">
-      {/* header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/60 bg-surface-2/50">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>
-            Week {pred.week}
-            {kickoff && (
-              <> · {kickoff.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" })}</>
-            )}
-          </span>
+    <div className={`rounded-xl border bg-surface overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 ${
+      isHighConf ? "border-[#FF6200]/30 hover:border-[#FF6200]/60" : "border-border hover:border-border/80"
+    }`}>
+      {/* top accent line */}
+      <div
+        className="h-0.5 w-full"
+        style={{
+          background: isHighConf
+            ? "linear-gradient(90deg, #FF6200, #FF8C00)"
+            : "linear-gradient(90deg, #252d3d, #252d3d)",
+        }}
+      />
+
+      {/* header row */}
+      <div className="flex items-center justify-between px-4 py-2 bg-black/20">
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
+          {rank && (
+            <span className="inline-flex items-center justify-center h-4 w-4 rounded bg-[#FF6200]/20 text-[#FF6200] font-black">
+              {rank}
+            </span>
+          )}
+          <Calendar className="h-3 w-3" />
+          <span>Wk {pred.week}</span>
+          {kickoff && (
+            <span>
+              · {kickoff.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+            </span>
+          )}
         </div>
-        {pred.confidence !== undefined && <ConfidenceBadge confidence={pred.confidence} />}
+
+        {/* confidence pill */}
+        <div
+          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide border ${
+            confidence >= 80
+              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+              : confidence >= 65
+              ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
+              : "bg-slate-600/20 text-slate-400 border-slate-600/25"
+          }`}
+        >
+          <Activity className="h-2.5 w-2.5" />
+          {confidence.toFixed(0)}% conf
+        </div>
       </div>
 
-      {/* matchup */}
-      <div className="px-4 py-4">
-        <div className="flex items-center gap-3">
-          <TeamBlock
+      {/* teams */}
+      <div className="px-4 pt-4 pb-3">
+        <div className="flex items-start gap-3 mb-4">
+          <TeamBadge
             abbr={pred.awayTeam!}
             fullName={pred.awayTeamFull!}
-            winPct={pred.awayWinProbability ?? 50}
-            isWinner={!homeWin}
             side="away"
+            isWinner={!homeWin}
           />
-
-          <div className="shrink-0 flex flex-col items-center gap-1">
-            <span className="text-xs font-black text-muted-foreground/50 uppercase tracking-widest">vs</span>
-            {homeWin ? (
-              <span className="text-[9px] font-bold text-[#FF6200] uppercase tracking-wide">home fav</span>
-            ) : (
-              <span className="text-[9px] font-bold text-[#00A8FF] uppercase tracking-wide">away fav</span>
-            )}
+          <div className="shrink-0 pt-3 text-center">
+            <span className="text-lg font-black text-muted-foreground/30">@</span>
           </div>
-
-          <TeamBlock
+          <TeamBadge
             abbr={pred.homeTeam!}
             fullName={pred.homeTeamFull!}
-            winPct={pred.homeWinProbability ?? 50}
-            isWinner={homeWin}
             side="home"
+            isWinner={homeWin}
           />
         </div>
+
+        {/* tug-of-war prob bar */}
+        <WinProbBar
+          homeTeam={pred.homeTeam!}
+          awayTeam={pred.awayTeam!}
+          homeWinPct={pred.homeWinProbability ?? 50}
+          awayWinPct={pred.awayWinProbability ?? 50}
+        />
       </div>
 
-      {/* footer: stats pills */}
+      {/* stat compare */}
       {pred.homeTeamStats && pred.awayTeamStats && (
-        <div className="px-4 pb-3 flex flex-wrap gap-2">
-          {[
-            {
-              label: `${pred.awayTeam} PPG`,
-              val: (pred.awayTeamStats.pts_for ?? 0).toFixed(1),
-            },
-            {
-              label: `${pred.awayTeam} PA`,
-              val: (pred.awayTeamStats.pts_against ?? 0).toFixed(1),
-            },
-            {
-              label: `${pred.homeTeam} PPG`,
-              val: (pred.homeTeamStats.pts_for ?? 0).toFixed(1),
-            },
-            {
-              label: `${pred.homeTeam} PA`,
-              val: (pred.homeTeamStats.pts_against ?? 0).toFixed(1),
-            },
-          ].map((s) => (
-            <span key={s.label} className="text-[10px] rounded-md bg-secondary px-2 py-0.5 text-muted-foreground">
-              {s.label}: <span className="text-foreground font-semibold">{s.val}</span>
-            </span>
-          ))}
+        <div className="px-4 pb-4 border-t border-border/40 pt-3 mt-1">
+          <StatCompareBar
+            homeTeam={pred.homeTeam!}
+            awayTeam={pred.awayTeam!}
+            homeStats={pred.homeTeamStats}
+            awayStats={pred.awayTeamStats}
+          />
         </div>
       )}
     </div>
@@ -189,133 +171,187 @@ export default async function PredictionsPage() {
 
   const byWeek = predictions.reduce<Record<number, IPrediction[]>>((acc, p) => {
     const w = p.week ?? 0;
-    if (!acc[w]) acc[w] = [];
-    acc[w].push(p);
+    (acc[w] ??= []).push(p);
     return acc;
   }, {});
+  const weeks = Object.keys(byWeek).map(Number).sort((a, b) => a - b);
 
-  const weeks = Object.keys(byWeek)
-    .map(Number)
-    .sort((a, b) => a - b);
+  // top picks = highest confidence across all weeks
+  const topPicks = [...predictions]
+    .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+    .slice(0, 5);
 
   return (
-    <div className="container py-10 md:py-14">
-      {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-          <div className="flex items-center gap-2.5 mb-3">
-            <Brain className="h-6 w-6 text-[#FF6200]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#FF6200]">
-              AI Predictions
-            </span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-            NFL Game <span className="text-gradient">Predictions</span>
-          </h1>
-          <p className="text-muted-foreground max-w-xl leading-relaxed">
-            XGBoost model trained on 4 seasons of NFL game data (2021–2024). Features include
-            rolling win rates, points scored/allowed, and point differential — all computed
-            without data leakage using a strict time-series split.
-          </p>
-        </div>
+    <div className="min-h-screen">
+      {/* Hero banner */}
+      <div className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-[#0e1118] to-[#161b27]">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyNTJkM2QiIGZpbGwtb3BhY2l0eT0iMC4zIj48cGF0aCBkPSJNMzYgMzRoLTJ2Mmgydi0yem0tNCAwaDJ2LTJoLTJ2MnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
+        <div className="container relative py-12 md:py-16">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-[#FF6200]/15 border border-[#FF6200]/30">
+                  <Brain className="h-4 w-4 text-[#FF6200]" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#FF6200]">
+                  ML-Powered · XGBoost Model
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-none">
+                NFL Game
+                <br />
+                <span className="text-gradient">Predictions</span>
+              </h1>
+              <p className="text-muted-foreground text-base leading-relaxed max-w-lg">
+                Trained on <strong className="text-foreground">1,136 games</strong> across 4 seasons. Rolling
+                team efficiency metrics, strict time-series validation, zero data leakage.
+              </p>
+            </div>
 
-        {/* Model stats card */}
-        <div className="shrink-0 rounded-xl border border-border bg-surface p-5 min-w-[220px]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Model Stats
-          </p>
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Target className="h-3.5 w-3.5" />
-                Accuracy
-              </div>
-              <span className="text-sm font-bold text-emerald-400">
-                {meta?.accuracy != null ? `${meta.accuracy}%` : "—"}
-              </span>
+            {/* stat pills */}
+            <div className="flex flex-wrap md:flex-col gap-3">
+              {[
+                { label: "Model Accuracy", value: meta?.accuracy != null ? `${meta.accuracy}%` : "—", color: "text-emerald-400" },
+                { label: "Games Predicted", value: predictions.length.toString(), color: "text-[#00A8FF]" },
+                { label: "Training Seasons", value: "2021–2024", color: "text-amber-400" },
+              ].map((s) => (
+                <div key={s.label} className="rounded-lg border border-border bg-black/30 px-4 py-2.5 flex items-center gap-3 min-w-[160px]">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{s.label}</p>
+                    <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <BarChart3 className="h-3.5 w-3.5" />
-                Training games
-              </div>
-              <span className="text-sm font-bold">
-                {meta?.trainingSamples?.toLocaleString() ?? "—"}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <TrendingUp className="h-3.5 w-3.5" />
-                Seasons
-              </div>
-              <span className="text-sm font-bold">2021–2024</span>
-            </div>
-            {meta?.updatedAt && (
-              <div className="pt-1 border-t border-border/60">
-                <p className="text-[10px] text-muted-foreground/60">
-                  Updated {new Date(meta.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Admin refresh */}
-      <div className="mb-8">
-        <PredictionsRefreshButton />
-      </div>
-
-      {/* Predictions list */}
-      {predictions.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-12 text-center">
-          <Brain className="h-10 w-10 text-muted-foreground/40 mx-auto mb-4" />
-          <p className="text-lg font-semibold mb-2">No predictions yet</p>
-          <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-            Click &ldquo;Run ML Model&rdquo; above to train the XGBoost model and generate predictions
-            for all upcoming scheduled games.
-          </p>
+      <div className="container py-10">
+        {/* Refresh button */}
+        <div className="mb-8">
+          <PredictionsRefreshButton />
         </div>
-      ) : (
-        <div className="space-y-10">
-          {weeks.map((week) => (
-            <section key={week}>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
-                <span className="h-px flex-1 bg-border/60" />
-                Week {week}
-                <span className="h-px flex-1 bg-border/60" />
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {byWeek[week].map((pred) => (
-                  <PredictionCard key={String(pred._id)} pred={pred} />
+
+        {predictions.length === 0 ? (
+          <div className="rounded-xl border border-border bg-surface p-16 text-center">
+            <Brain className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-xl font-bold mb-2">No predictions yet</p>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+              Click &ldquo;Run ML Model&rdquo; above to train the XGBoost model and generate
+              predictions for all upcoming scheduled games.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Overview charts */}
+            <OverviewCharts predictions={predictions} accuracy={meta?.accuracy ?? null} />
+
+            {/* Top picks */}
+            <section className="mb-12">
+              <div className="flex items-center gap-3 mb-5">
+                <Trophy className="h-5 w-5 text-amber-400" />
+                <h2 className="text-lg font-black uppercase tracking-wide">Top Picks This Week</h2>
+                <span className="text-xs text-muted-foreground">(highest confidence)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                {topPicks.map((pred, i) => (
+                  <div
+                    key={String(pred._id)}
+                    className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest">
+                        #{i + 1} Pick
+                      </span>
+                      <span className="text-[9px] text-muted-foreground">Wk {pred.week}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {[pred.awayTeam, pred.homeTeam].map((abbr, j) => {
+                        const t = getTeam(abbr!);
+                        return (
+                          <div key={j} className="flex items-center gap-1.5 flex-1">
+                            <div
+                              className="h-6 w-6 rounded flex items-center justify-center text-[8px] font-black text-white shrink-0"
+                              style={{ background: t.color }}
+                            >
+                              {abbr?.slice(0, 3)}
+                            </div>
+                            {j === 0 && <span className="text-[8px] text-muted-foreground/40">@</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="text-sm font-black text-white">
+                      {pred.predictedWinner}{" "}
+                      <span className="text-xs font-normal text-muted-foreground">wins</span>
+                    </div>
+                    <div className="text-xs font-bold text-emerald-400">
+                      {pred.confidence?.toFixed(0)}% confidence
+                    </div>
+                    <div className="h-1 rounded-full bg-white/5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-emerald-400"
+                        style={{ width: `${pred.confidence}%` }}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             </section>
-          ))}
-        </div>
-      )}
 
-      {/* Methodology note */}
-      <div className="mt-14 rounded-xl border border-border/50 bg-surface-2/30 p-6">
-        <h3 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3">
-          Methodology
-        </h3>
-        <div className="grid sm:grid-cols-3 gap-4 text-xs text-muted-foreground leading-relaxed">
-          <div>
-            <p className="font-semibold text-foreground mb-1">Data</p>
-            ESPN historical scoreboard API, seasons 2021–2024. ~1,100 regular-season + playoff games.
-          </div>
-          <div>
-            <p className="font-semibold text-foreground mb-1">Features</p>
-            Rolling 6-game window: win rate, PPG, PA, point differential for home &amp; away teams.
-            No future data is used (strict time-series ordering).
-          </div>
-          <div>
-            <p className="font-semibold text-foreground mb-1">Model</p>
-            XGBoost classifier (300 trees, depth 4). Trained on first 75% of historical games,
-            validated on last 25% by chronological order to prevent look-ahead bias.
-          </div>
-        </div>
+            {/* All games by week */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <ChevronRight className="h-5 w-5 text-[#FF6200]" />
+                <h2 className="text-lg font-black uppercase tracking-wide">All Predictions</h2>
+              </div>
+
+              <div className="space-y-12">
+                {weeks.map((week) => (
+                  <div key={week}>
+                    <div className="flex items-center gap-3 mb-5">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1 text-xs font-black uppercase tracking-widest text-foreground">
+                        Week {week}
+                      </span>
+                      <div className="h-px flex-1 bg-border/50" />
+                      <span className="text-xs text-muted-foreground">{byWeek[week].length} games</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {byWeek[week].map((pred) => (
+                        <PredictionCard key={String(pred._id)} pred={pred} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Methodology */}
+            <div className="mt-16 rounded-xl border border-border/40 bg-surface/50 p-6">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">
+                How It Works
+              </p>
+              <div className="grid sm:grid-cols-3 gap-6 text-sm text-muted-foreground leading-relaxed">
+                <div>
+                  <p className="font-semibold text-foreground mb-1.5">1 · Data</p>
+                  ESPN scoreboard API · 2021–2024 regular season + playoffs · 1,136 completed games
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-1.5">2 · Features</p>
+                  Rolling 6-game window per team: win rate, PPG, points allowed, point differential.
+                  All features computed from prior games only — no future data.
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-1.5">3 · Model</p>
+                  XGBoost classifier · 300 trees · depth 4 · time-series train/test split (75/25) ·
+                  home field advantage included as implicit feature.
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
