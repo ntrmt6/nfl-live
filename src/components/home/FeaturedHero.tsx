@@ -6,12 +6,14 @@ import { getTeam } from "@/lib/teams";
 import { formatGameTime } from "@/lib/utils";
 import { GameDTO } from "@/types";
 import { cn } from "@/lib/utils";
+import type { LiveScoresMap } from "@/hooks/useLiveScores";
 
 interface FeaturedHeroProps {
   game: GameDTO | null;
+  liveScores?: LiveScoresMap;
 }
 
-export function FeaturedHero({ game }: FeaturedHeroProps) {
+export function FeaturedHero({ game, liveScores }: FeaturedHeroProps) {
   if (!game) {
     return (
       <div className="w-full rounded-lg border border-border bg-card overflow-hidden">
@@ -28,22 +30,33 @@ export function FeaturedHero({ game }: FeaturedHeroProps) {
 
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
-  const isLive = game.status === "live";
-  const isFinal = game.status === "final";
+  const liveData = liveScores?.get(`${game.awayTeam}-${game.homeTeam}`);
+  const effectiveStatus = liveData?.status ?? game.status;
+  const isLive = effectiveStatus === "live";
+  const isHalftime = effectiveStatus === "halftime";
+  const isFinal = effectiveStatus === "final";
+
+  const homeScore = liveData?.homeScore ?? game.homeScore ?? 0;
+  const awayScore = liveData?.awayScore ?? game.awayScore ?? 0;
 
   return (
     <Link href={`/games/${game.slug}`} className="group block w-full">
       <div className="relative w-full rounded-lg border border-border bg-card overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-glow">
         {/* Status badge */}
         <div className="absolute top-3 right-3 z-10">
-          {isLive ? (
+          {isHalftime ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-orange-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+              HALFTIME
+            </span>
+          ) : isLive ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-red-400">
               <span className="live-pulse" />
-              LIVE
+              {liveData?.statusText ?? "LIVE"}
             </span>
           ) : isFinal ? (
             <span className="inline-flex items-center rounded-full bg-secondary border border-border px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-              FINAL
+              {liveData?.statusText ?? "FINAL"}
             </span>
           ) : (
             <span className="inline-flex items-center rounded-full bg-[rgba(0,168,255,0.12)] border border-[rgba(0,168,255,0.25)] px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-[#00A8FF]">
@@ -85,10 +98,13 @@ export function FeaturedHero({ game }: FeaturedHeroProps) {
               {away.name}
             </span>
 
-            {/* Score if live/final */}
-            {(isLive || isFinal) && (
-              <span className="mt-2 text-2xl font-black tabular-nums text-foreground">
-                {game.awayScore ?? 0}
+            {/* Score if live/halftime/final */}
+            {(isLive || isHalftime || isFinal) && (
+              <span className={cn(
+                "mt-2 text-2xl font-black tabular-nums",
+                (isLive || isHalftime) && awayScore > homeScore ? "text-[#FF6200]" : "text-foreground"
+              )}>
+                {awayScore}
               </span>
             )}
 
@@ -141,10 +157,13 @@ export function FeaturedHero({ game }: FeaturedHeroProps) {
               {home.name}
             </span>
 
-            {/* Score if live/final */}
-            {(isLive || isFinal) && (
-              <span className="mt-2 text-2xl font-black tabular-nums text-foreground">
-                {game.homeScore ?? 0}
+            {/* Score if live/halftime/final */}
+            {(isLive || isHalftime || isFinal) && (
+              <span className={cn(
+                "mt-2 text-2xl font-black tabular-nums",
+                (isLive || isHalftime) && homeScore > awayScore ? "text-[#FF6200]" : "text-foreground"
+              )}>
+                {homeScore}
               </span>
             )}
 

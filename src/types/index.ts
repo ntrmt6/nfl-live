@@ -19,6 +19,18 @@ export interface GameDTO {
   description?: string;
 }
 
+export interface LiveGameScore {
+  key: string; // "AWAY-HOME" using our team abbrs
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  status: "scheduled" | "live" | "halftime" | "final";
+  period: number;
+  clock: string;
+  statusText: string; // e.g. "Q2 4:32" | "Halftime" | "Final" | "Final/OT"
+}
+
 export interface PostDTO {
   _id: string;
   slug: string;

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { getTeam } from "@/lib/teams";
 import { cn } from "@/lib/utils";
-import { GameDTO } from "@/types";
+import { GameDTO, LiveGameScore } from "@/types";
 
 function shortTime(kickoff: string): string {
   const d = new Date(kickoff);
@@ -11,14 +11,27 @@ function shortTime(kickoff: string): string {
   return `${day} ${time} ET`;
 }
 
-export function GameCard({ game, index = 0 }: { game: GameDTO; index?: number }) {
+interface GameCardProps {
+  game: GameDTO;
+  index?: number;
+  liveData?: LiveGameScore;
+}
+
+export function GameCard({ game, index = 0, liveData }: GameCardProps) {
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
-  const isLive = game.status === "live";
-  const isFinal = game.status === "final";
-  const showScore = isLive || isFinal;
 
-  // index is accepted for API compatibility but animation is handled by CSS
+  // Merge live ESPN data on top of DB data
+  const effectiveStatus = liveData?.status ?? game.status;
+  const isLive = effectiveStatus === "live";
+  const isHalftime = effectiveStatus === "halftime";
+  const isFinal = effectiveStatus === "final";
+  const showScore = isLive || isHalftime || isFinal;
+
+  const homeScore = liveData?.homeScore ?? game.homeScore ?? 0;
+  const awayScore = liveData?.awayScore ?? game.awayScore ?? 0;
+
+  // index accepted for API compatibility
   void index;
 
   return (
@@ -26,7 +39,7 @@ export function GameCard({ game, index = 0 }: { game: GameDTO; index?: number })
       <div
         className={cn(
           "flex border border-border bg-card rounded overflow-hidden card-hover",
-          isLive && "border-[#FF6200]/40"
+          (isLive || isHalftime) && "border-[#FF6200]/40"
         )}
       >
         {/* Left color bar */}
@@ -43,14 +56,19 @@ export function GameCard({ game, index = 0 }: { game: GameDTO; index?: number })
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
               WK {game.week}
             </span>
-            {isLive ? (
+            {isHalftime ? (
+              <span className="flex items-center gap-1 text-[10px] font-black text-orange-400 uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                HALF
+              </span>
+            ) : isLive ? (
               <span className="flex items-center gap-1 text-[10px] font-black text-red-400 uppercase">
                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                LIVE
+                {liveData?.statusText ?? "LIVE"}
               </span>
             ) : isFinal ? (
               <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                FINAL
+                {liveData?.statusText ?? "FINAL"}
               </span>
             ) : (
               <span
@@ -83,12 +101,12 @@ export function GameCard({ game, index = 0 }: { game: GameDTO; index?: number })
                 <span
                   className={cn(
                     "text-sm font-black tabular-nums shrink-0",
-                    isLive && (game.awayScore ?? 0) > (game.homeScore ?? 0)
+                    (isLive || isHalftime) && awayScore > homeScore
                       ? "text-[#FF6200]"
                       : "text-foreground"
                   )}
                 >
-                  {game.awayScore ?? 0}
+                  {awayScore}
                 </span>
               )}
             </div>
@@ -114,12 +132,12 @@ export function GameCard({ game, index = 0 }: { game: GameDTO; index?: number })
                 <span
                   className={cn(
                     "text-sm font-black tabular-nums shrink-0",
-                    isLive && (game.homeScore ?? 0) > (game.awayScore ?? 0)
+                    (isLive || isHalftime) && homeScore > awayScore
                       ? "text-[#FF6200]"
                       : "text-foreground"
                   )}
                 >
-                  {game.homeScore ?? 0}
+                  {homeScore}
                 </span>
               )}
             </div>

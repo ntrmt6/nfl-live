@@ -1,8 +1,7 @@
 import { getUpcomingGames } from "@/lib/data/games";
 import { getPublishedPosts } from "@/lib/data/posts";
 import { BreakingNewsFeed } from "@/components/home/BreakingNewsFeed";
-import { FeaturedHero } from "@/components/home/FeaturedHero";
-import { ScheduleGrid } from "@/components/home/ScheduleGrid";
+import { LiveScoresWrapper } from "@/components/home/LiveScoresWrapper";
 import { StandingsWidget } from "@/components/home/StandingsWidget";
 import { LeagueLeaders } from "@/components/home/LeagueLeaders";
 
@@ -28,8 +27,7 @@ export default async function HomePage() {
 
           {/* CENTER COLUMN — Featured + Schedule */}
           <main className="flex-1 min-w-0 space-y-5">
-            <FeaturedHero game={featuredGame} />
-            <ScheduleGrid games={games} />
+            <LiveScoresWrapper featuredGame={featuredGame} games={games} />
           </main>
 
           {/* RIGHT COLUMN — Standings + Leaders */}

@@ -7,8 +7,14 @@ import { Input } from "@/components/ui/input";
 import { TEAM_LIST } from "@/lib/teams";
 import { GameDTO } from "@/types";
 import { cn } from "@/lib/utils";
+import type { LiveScoresMap } from "@/hooks/useLiveScores";
 
-export function ScheduleGrid({ games }: { games: GameDTO[] }) {
+interface ScheduleGridProps {
+  games: GameDTO[];
+  liveScores?: LiveScoresMap;
+}
+
+export function ScheduleGrid({ games, liveScores }: ScheduleGridProps) {
   const [teamFilter, setTeamFilter] = useState<string>("ALL");
   const [query, setQuery] = useState("");
   const [teamExpanded, setTeamExpanded] = useState(false);
@@ -155,7 +161,12 @@ export function ScheduleGrid({ games }: { games: GameDTO[] }) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtered.map((game, i) => (
-            <GameCard key={game._id} game={game} index={i} />
+            <GameCard
+              key={game._id}
+              game={game}
+              index={i}
+              liveData={liveScores?.get(`${game.awayTeam}-${game.homeTeam}`)}
+            />
           ))}
         </div>
       )}
