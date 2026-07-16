@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/#schedule", label: "Scores" },
   { href: "/#schedule", label: "Schedule" },
+  { href: "/predictions", label: "Predictions" },
   { href: "/blog", label: "Analysis" },
   { href: "/blog?tag=NFL+Picks", label: "Picks" },
   { href: "/blog?tag=Fantasy+Football+2026", label: "Fantasy" },
