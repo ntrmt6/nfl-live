@@ -29,12 +29,22 @@ export async function generateMetadata({
   return {
     title,
     description,
+    keywords: post.tags?.length ? post.tags : ["NFL", "NFL schedule", "NFL preview"],
     alternates: { canonical: absoluteUrl(`/blog/${post.slug}`) },
     openGraph: {
       title,
       description,
       type: "article",
       url: absoluteUrl(`/blog/${post.slug}`),
+      images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 675, alt: title }] : undefined,
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "HD NFL TV",
+      publishedTime: post.createdAt,
+      modifiedTime: post.updatedAt,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
       images: post.coverImage ? [post.coverImage] : undefined,
     },
   };

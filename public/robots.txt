@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/admin/
+Disallow: /api/settings/
+
+Sitemap: https://hdnfltv.com/sitemap.xml

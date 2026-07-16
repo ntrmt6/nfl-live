@@ -60,3 +60,17 @@ export async function getAllGameSlugs(): Promise<string[]> {
     return [];
   }
 }
+
+export async function getAllGamesForSitemap(): Promise<{ slug: string; updatedAt: Date; kickoff: Date }[]> {
+  try {
+    await connectDB();
+    const games = await Game.find({}, "slug updatedAt kickoff").lean();
+    return games.map((g: any) => ({
+      slug: g.slug,
+      updatedAt: new Date(g.updatedAt),
+      kickoff: new Date(g.kickoff),
+    }));
+  } catch {
+    return [];
+  }
+}

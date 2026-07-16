@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Trophy, Newspaper, LogOut, Radio } from "lucide-react";
+import { LayoutDashboard, Trophy, Newspaper, LogOut, Radio, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/games", label: "Games", icon: Trophy },
   { href: "/admin/blog", label: "Blog Posts", icon: Newspaper },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {

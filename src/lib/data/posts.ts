@@ -55,3 +55,13 @@ export async function getAllPostSlugs(): Promise<string[]> {
     return [];
   }
 }
+
+export async function getAllPostsForSitemap(): Promise<{ slug: string; updatedAt: Date }[]> {
+  try {
+    await connectDB();
+    const posts = await Post.find({ published: true }, "slug updatedAt").lean();
+    return posts.map((p: any) => ({ slug: p.slug, updatedAt: new Date(p.updatedAt) }));
+  } catch {
+    return [];
+  }
+}

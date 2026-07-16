@@ -27,20 +27,41 @@ export async function generateMetadata({
 
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
-  const title = `${away.name} vs ${home.name} - Live Schedule & Coverage`;
+
+  const kickoffDate = new Date(game.kickoff).toLocaleDateString("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric",
+  });
+
+  const title = `${away.name} vs ${home.name} Week ${game.week} – Live Stream & Coverage`;
   const description =
     game.description ||
-    `Kickoff time, TV network, and live game-day coverage for ${away.name} at ${home.name}, Week ${game.week}.`;
+    `Watch ${away.name} at ${home.name} live on ${game.network || "TV"}. Kickoff ${kickoffDate} at ${game.venue || home.name + " Stadium"}. Get the full schedule, broadcast info, and live coverage on HD NFL TV.`;
 
   return {
     title,
     description,
+    keywords: [
+      `${away.name} vs ${home.name}`,
+      `${away.name} ${home.name} live stream`,
+      `NFL Week ${game.week}`,
+      `${away.name} game today`,
+      `${home.name} game today`,
+      "NFL live stream",
+      "watch NFL online",
+      "NFL schedule",
+    ],
     alternates: { canonical: absoluteUrl(`/games/${game.slug}`) },
     openGraph: {
       title,
       description,
       url: absoluteUrl(`/games/${game.slug}`),
       type: "website",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "HD NFL TV",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }

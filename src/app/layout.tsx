@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/components/ui/toast";
 import { AdSenseScript } from "@/components/AdSenseScript";
 import { organizationSchema, websiteSchema } from "@/lib/schema-org";
+import { connectDB } from "@/lib/db";
+import Settings from "@/models/Settings";
+
+async function getAdsenseClientId(): Promise<string> {
+  try {
+    await connectDB();
+    const settings = await Settings.findOne().lean() as { adsenseClientId?: string } | null;
+    return settings?.adsenseClientId ?? "";
+  } catch {
+    return "";
+  }
+}
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -19,48 +32,75 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   title: {
-    default: `${SITE_NAME} | NFL Schedule, Scores & Live Game Coverage`,
+    default: `${SITE_NAME} | NFL Schedule, Live Stream & Game Coverage 2026`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Your independent fan hub for the full NFL schedule, kickoff times, team news, and game-day blog coverage — all in one premium dashboard.",
+    "HD NFL TV — your complete source for the 2026 NFL schedule, kickoff times, live stream info, and expert game-day coverage for every team and every week.",
   keywords: [
-    "NFL schedule",
-    "NFL live",
+    "NFL schedule 2026",
+    "NFL live stream",
+    "watch NFL online",
     "NFL games today",
-    "football schedule",
+    "NFL kickoff times",
+    "NFL TV schedule",
+    "NFL live coverage",
+    "football schedule 2026",
+    "NFL week by week schedule",
+    "NFL network schedule",
+    "NFL streaming",
+    "NFL game preview",
     "NFL blog",
+    "HD NFL TV",
   ],
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | NFL Schedule, Scores & Live Game Coverage`,
+    title: `${SITE_NAME} | NFL Schedule, Live Stream & Game Coverage 2026`,
     description:
-      "Your independent fan hub for the full NFL schedule, kickoff times, team news, and game-day blog coverage.",
+      "Your complete source for the 2026 NFL schedule, kickoff times, live stream info, and expert game-day coverage.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | NFL Schedule & Live Coverage`,
+    title: `${SITE_NAME} | NFL Schedule & Live Stream 2026`,
     description:
-      "Your independent fan hub for the full NFL schedule, kickoff times, and game-day blog coverage.",
+      "Full 2026 NFL schedule, kickoff times, broadcast info, and live game coverage — all in one place.",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const adsenseClientId = await getAdsenseClientId();
   return (
     <html lang="en" className={roboto.variable}>
+      <head>
+        {adsenseClientId && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
+      </head>
       <body className="font-sans min-h-screen flex flex-col">
-        <AdSenseScript />
+        <AdSenseScript clientId={adsenseClientId} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}

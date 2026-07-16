@@ -37,30 +37,35 @@ export function sportsEventSchema(game: IGame) {
   return {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
-    name: `${away.name} at ${home.name}`,
+    name: `${away.name} vs ${home.name}`,
+    alternateName: `${away.abbr} at ${home.abbr} Week ${game.week}`,
     startDate: new Date(game.kickoff).toISOString(),
     eventStatus: mapEventStatus(game.status),
-    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+    eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
     location: {
       "@type": "Place",
       name: game.venue || `${home.name} Stadium`,
+      address: { "@type": "PostalAddress", addressCountry: "US" },
     },
     homeTeam: {
       "@type": "SportsTeam",
       name: home.name,
+      sport: "American Football",
     },
     awayTeam: {
       "@type": "SportsTeam",
       name: away.name,
+      sport: "American Football",
     },
+    sport: "American Football",
     organizer: {
       "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
+      name: "National Football League",
+      url: "https://www.nfl.com",
     },
     description:
       game.description ||
-      `Follow the live schedule, kickoff time, and viewing info for ${away.name} vs ${home.name} in week ${game.week}.`,
+      `Watch ${away.name} at ${home.name} live. Kickoff time, TV network (${game.network || "TBD"}), venue, and live stream coverage for NFL Week ${game.week}.`,
     url: absoluteUrl(`/games/${game.slug}`),
   };
 }
@@ -82,17 +87,24 @@ export function blogPostingSchema(post: IPost) {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage ? [post.coverImage] : undefined,
+    image: post.coverImage
+      ? [{ "@type": "ImageObject", url: post.coverImage, width: 1200, height: 675 }]
+      : undefined,
+    keywords: post.tags?.join(", "),
     author: {
-      "@type": "Person",
+      "@type": "Organization",
       name: post.author,
+      url: SITE_URL,
     },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
+      url: SITE_URL,
       logo: {
         "@type": "ImageObject",
         url: absoluteUrl("/logo.png"),
+        width: 200,
+        height: 60,
       },
     },
     datePublished: post.createdAt ? new Date(post.createdAt).toISOString() : undefined,
@@ -100,6 +112,12 @@ export function blogPostingSchema(post: IPost) {
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": absoluteUrl(`/blog/${post.slug}`),
+    },
+    inLanguage: "en-US",
+    isPartOf: {
+      "@type": "Blog",
+      name: `${SITE_NAME} Blog`,
+      url: `${SITE_URL}/blog`,
     },
   };
 }
