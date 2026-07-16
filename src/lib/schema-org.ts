@@ -4,7 +4,7 @@ import { IPrediction } from "@/models/Prediction";
 import { absoluteUrl } from "@/lib/utils";
 import { getTeam } from "@/lib/teams";
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Live Zone";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export function organizationSchema() {

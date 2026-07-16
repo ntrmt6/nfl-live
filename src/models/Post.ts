@@ -24,7 +24,7 @@ const PostSchema = new Schema<IPost>(
     excerpt: { type: String, required: true },
     content: { type: String, required: true },
     coverImage: { type: String },
-    author: { type: String, default: "NFL Live Zone Staff" },
+    author: { type: String, default: "NFL Predictions Hub Staff" },
     tags: { type: [String], default: [] },
     published: { type: Boolean, default: false },
     metaTitle: { type: String },

@@ -3,12 +3,12 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Disclaimer",
-  description: "Affiliate, editorial, and trademark disclaimers for NFL Live Zone.",
+  description: "Affiliate, editorial, and trademark disclaimers for NFL Predictions Hub.",
   alternates: { canonical: absoluteUrl("/disclaimer") },
   robots: { index: true, follow: true },
 };
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Live Zone";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub";
 
 export default function DisclaimerPage() {
   return (

@@ -57,7 +57,7 @@ export async function generateMetadata({
       description,
       url: absoluteUrl(`/games/${game.slug}`),
       type: "website",
-      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "HD NFL TV",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub",
     },
     twitter: {
       card: "summary_large_image",

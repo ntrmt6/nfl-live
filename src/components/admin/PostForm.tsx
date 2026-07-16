@@ -29,7 +29,7 @@ const DEFAULT_VALUES: PostFormValues = {
   excerpt: "",
   content: "",
   coverImage: "",
-  author: "NFL Live Zone Staff",
+  author: "NFL Predictions Hub Staff",
   tags: [],
   published: false,
   metaTitle: "",

@@ -3,12 +3,12 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
-  description: "Terms and conditions governing your use of NFL Live Zone.",
+  description: "Terms and conditions governing your use of NFL Predictions Hub.",
   alternates: { canonical: absoluteUrl("/terms") },
   robots: { index: true, follow: true },
 };
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Live Zone";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub";
 
 export default function TermsPage() {
   return (

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Radio, User, LogOut, ChevronDown, Shield } from "lucide-react";
+import { Menu, X, TrendingUp, User, LogOut, ChevronDown, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { UserAvatar } from "@/components/comments/UserAvatar";
@@ -51,26 +51,24 @@ export function Header() {
           <div className="container h-full flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF6200] to-[#FF8C00] shadow-glow">
-                <Shield className="h-4 w-4 text-white" fill="currentColor" />
-                <span className="absolute inset-0 flex items-center justify-center text-[8px] font-black text-white leading-none pt-0.5">
-                  NFL
-                </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF6200] to-[#FF8C00] shadow-glow">
+                <Brain className="h-4 w-4 text-white" />
               </span>
               <span className="font-bold text-base tracking-tight leading-none">
                 NFL{" "}
-                <span className="text-muted-foreground font-medium">Live Zone</span>
+                <span className="text-[#FF6200] font-black">Predictions</span>{" "}
+                <span className="text-muted-foreground font-medium">Hub</span>
               </span>
             </Link>
 
             {/* Desktop right: Watch Live + user menu */}
             <div className="hidden md:flex items-center gap-3">
               <Link
-                href="/#schedule"
-                className="inline-flex items-center gap-1.5 rounded-md bg-red-600 hover:bg-red-500 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-white transition-colors shadow-sm"
+                href="/predictions"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-[#FF6200] to-[#FF8C00] hover:brightness-110 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-white transition-all shadow-sm"
               >
-                <Radio className="h-3.5 w-3.5" />
-                Watch Live
+                <TrendingUp className="h-3.5 w-3.5" />
+                AI Picks
               </Link>
 
               {user ? (
@@ -203,12 +201,12 @@ export function Header() {
                 ))}
 
                 <Link
-                  href="/#schedule"
+                  href="/predictions"
                   onClick={() => setOpen(false)}
-                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-bold text-white"
+                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#FF6200] to-[#FF8C00] px-4 py-2.5 text-sm font-bold text-white"
                 >
-                  <Radio className="h-4 w-4" />
-                  Watch Live
+                  <TrendingUp className="h-4 w-4" />
+                  AI Picks
                 </Link>
 
                 {user ? (

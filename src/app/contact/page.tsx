@@ -5,7 +5,7 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: "Get in touch with the NFL Live Zone editorial and support team.",
+  description: "Get in touch with the NFL Predictions Hub editorial and support team.",
   alternates: { canonical: absoluteUrl("/contact") },
 };
 

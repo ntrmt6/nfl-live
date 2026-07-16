@@ -3,12 +3,12 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How NFL Live Zone collects, uses, and protects your information.",
+  description: "How NFL Predictions Hub collects, uses, and protects your information.",
   alternates: { canonical: absoluteUrl("/privacy") },
   robots: { index: true, follow: true },
 };
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Live Zone";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub";
 
 export default function PrivacyPage() {
   return (

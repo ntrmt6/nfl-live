@@ -40,7 +40,7 @@ export async function generateMetadata({
       type: "article",
       url: absoluteUrl(`/blog/${post.slug}`),
       images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 675, alt: title }] : undefined,
-      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "HD NFL TV",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub",
       publishedTime: post.createdAt,
       modifiedTime: post.updatedAt,
     },

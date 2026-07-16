@@ -28,7 +28,7 @@ const roboto = Roboto({
   display: "swap",
 });
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Live Zone";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "NFL Predictions Hub";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     "NFL fan hub",
     "NFL blog",
     "football predictions 2026",
-    "HD NFL TV",
+    "NFL Predictions Hub",
   ],
   openGraph: {
     type: "website",

@@ -8,7 +8,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "NFL Blog & Analysis",
   description:
-    "In-depth NFL game previews, recaps, and storylines from the NFL Live Zone editorial team.",
+    "In-depth NFL game previews, predictions, recaps, and storylines from the NFL Predictions Hub editorial team.",
   alternates: { canonical: absoluteUrl("/blog") },
 };
 

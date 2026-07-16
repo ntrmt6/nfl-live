@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Radio, Twitter, Facebook, Instagram } from "lucide-react";
+import { TrendingUp, Twitter, Facebook, Instagram } from "lucide-react";
 
 const FOOTER_LINKS = {
   Site: [
@@ -20,18 +20,19 @@ export function Footer() {
       <div className="container py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div className="md:col-span-2">
           <Link href="/" className="flex items-center gap-2 mb-4">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-              <Radio className="h-5 w-5 text-black" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF6200] to-[#FF8C00]">
+              <TrendingUp className="h-5 w-5 text-white" />
             </span>
             <span className="font-bold text-lg">
-              NFL <span className="text-gradient">Live Zone</span>
+              NFL <span className="text-[#FF6200] font-black">Predictions</span>{" "}
+              <span className="text-muted-foreground">Hub</span>
             </span>
           </Link>
           <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
-            Your independent fan hub for the NFL schedule, kickoff times, and
-            game-day coverage. NFL Live Zone is a fan-operated media site and
-            is not affiliated with, endorsed by, or sponsored by the National
-            Football League.
+            AI-powered NFL game predictions, full schedule, matchup analysis,
+            and expert fan coverage. NFL Predictions Hub is an independent
+            fan-operated site and is not affiliated with or endorsed by the
+            National Football League.
           </p>
           <div className="flex items-center gap-3 mt-5">
             <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-primary transition-colors">
@@ -68,7 +69,7 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground text-center sm:text-left">
-            &copy; {new Date().getFullYear()} NFL Live Zone. All rights reserved.
+            &copy; {new Date().getFullYear()} NFL Predictions Hub. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground text-center sm:text-right">
             NFL, team names, and logos are trademarks of their respective owners.
