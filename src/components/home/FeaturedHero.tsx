@@ -7,6 +7,7 @@ import { formatGameTime } from "@/lib/utils";
 import { GameDTO } from "@/types";
 import { cn } from "@/lib/utils";
 import type { LiveScoresMap } from "@/hooks/useLiveScores";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 
 interface FeaturedHeroProps {
   game: GameDTO | null;
@@ -83,13 +84,8 @@ export function FeaturedHero({ game, liveScores }: FeaturedHeroProps) {
               {away.abbr}
             </span>
 
-            {/* Team swatch */}
-            <span
-              className="inline-flex items-center justify-center h-10 w-14 rounded-md text-sm font-black text-white shadow mb-2"
-              style={{ backgroundColor: away.color }}
-            >
-              {away.abbr}
-            </span>
+            {/* Team logo */}
+            <TeamLogo abbr={away.abbr} size={56} className="mb-2 drop-shadow-lg" />
 
             <span className="text-4xl font-black tracking-tighter text-foreground leading-none mb-1">
               {away.abbr}
@@ -142,13 +138,8 @@ export function FeaturedHero({ game, liveScores }: FeaturedHeroProps) {
               {home.abbr}
             </span>
 
-            {/* Team swatch */}
-            <span
-              className="inline-flex items-center justify-center h-10 w-14 rounded-md text-sm font-black text-white shadow mb-2"
-              style={{ backgroundColor: home.color }}
-            >
-              {home.abbr}
-            </span>
+            {/* Team logo */}
+            <TeamLogo abbr={home.abbr} size={56} className="mb-2 drop-shadow-lg" />
 
             <span className="text-4xl font-black tracking-tighter text-foreground leading-none mb-1">
               {home.abbr}

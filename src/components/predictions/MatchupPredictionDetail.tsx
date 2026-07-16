@@ -7,6 +7,7 @@ import {
 import { TrendingUp, TrendingDown, Minus, Trophy, Activity, Brain } from "lucide-react";
 import { getTeam } from "@/lib/teams";
 import { WinProbBar } from "./WinProbBar";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 import type { IPrediction } from "@/models/Prediction";
 
 function FactorRow({
@@ -219,10 +220,10 @@ export function MatchupPredictionDetail({ pred }: { pred: IPrediction }) {
               Team Profile
             </p>
             <div className="flex justify-center gap-5 mb-1">
-              {[{ abbr: pred.awayTeam!, c: away.color }, { abbr: pred.homeTeam!, c: home.color }].map(t => (
-                <div key={t.abbr} className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full" style={{ background: t.c }} />
-                  <span className="text-xs font-bold text-muted-foreground">{t.abbr}</span>
+              {[pred.awayTeam!, pred.homeTeam!].map(abbr => (
+                <div key={abbr} className="flex items-center gap-1.5">
+                  <TeamLogo abbr={abbr} size={20} />
+                  <span className="text-xs font-bold text-muted-foreground">{abbr}</span>
                 </div>
               ))}
             </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Tv, ChevronLeft, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MatchupPredictionDetail } from "@/components/predictions/MatchupPredictionDetail";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -157,9 +158,9 @@ export default async function GamePage({
           <div className="rounded-xl border border-border bg-card p-6">
             <h3 className="font-semibold mb-4">Matchup</h3>
             <div className="space-y-4">
-              <TeamBlock abbr={away.abbr} name={away.name} color={away.color} score={game.awayScore} isWinner={prediction?.predictedWinner === game.awayTeam} />
+              <TeamBlock abbr={away.abbr} name={away.name} score={game.awayScore} isWinner={prediction?.predictedWinner === game.awayTeam} />
               <div className="text-center text-xs text-muted-foreground">at</div>
-              <TeamBlock abbr={home.abbr} name={home.name} color={home.color} score={game.homeScore} isWinner={prediction?.predictedWinner === game.homeTeam} />
+              <TeamBlock abbr={home.abbr} name={home.name} score={game.homeScore} isWinner={prediction?.predictedWinner === game.homeTeam} />
             </div>
           </div>
 
@@ -200,19 +201,14 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
 }
 
 function TeamBlock({
-  abbr, name, color, score, isWinner,
+  abbr, name, score, isWinner,
 }: {
-  abbr: string; name: string; color: string; score?: number; isWinner?: boolean;
+  abbr: string; name: string; score?: number; isWinner?: boolean;
 }) {
   return (
     <div className={`flex items-center justify-between rounded-lg p-3 transition-colors ${isWinner ? "bg-[#FF6200]/10 border border-[#FF6200]/20" : "bg-secondary/40"}`}>
       <div className="flex items-center gap-3">
-        <span
-          className="flex h-10 w-10 items-center justify-center rounded-md text-xs font-bold text-white"
-          style={{ backgroundColor: color }}
-        >
-          {abbr}
-        </span>
+        <TeamLogo abbr={abbr} size={40} className="rounded-md" />
         <div>
           <span className="font-medium text-sm">{name}</span>
           {isWinner && (

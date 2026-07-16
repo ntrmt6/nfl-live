@@ -8,6 +8,7 @@ import {
 import { ChevronDown, Calendar, Activity, TrendingUp, TrendingDown, Minus, Trophy } from "lucide-react";
 import { getTeam } from "@/lib/teams";
 import { WinProbBar } from "./WinProbBar";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 import type { IPrediction } from "@/models/Prediction";
 
 // ── sub-components ────────────────────────────────────────────────────────────
@@ -19,13 +20,12 @@ function TeamBadge({
   return (
     <div className={`flex flex-col gap-2 flex-1 ${side === "home" ? "items-end" : "items-start"}`}>
       <div
-        className="h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black text-white shadow-lg ring-2 ring-white/10"
+        className="h-12 w-12 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white/10 overflow-hidden bg-black/20"
         style={{
-          background: `linear-gradient(135deg, ${team.color}, ${team.colorTo || team.color + "99"})`,
           boxShadow: isWinner ? `0 0 18px ${team.color}60` : undefined,
         }}
       >
-        {abbr.slice(0, 3)}
+        <TeamLogo abbr={abbr} size={44} />
       </div>
       <div className={side === "home" ? "text-right" : "text-left"}>
         <p className={`text-[10px] font-semibold uppercase tracking-wide ${isWinner ? "text-[#FF6200]" : "text-muted-foreground"}`}>

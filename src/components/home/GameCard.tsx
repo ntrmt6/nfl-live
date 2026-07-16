@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { getTeam } from "@/lib/teams";
 import { cn } from "@/lib/utils";
 import { GameDTO, LiveGameScore } from "@/types";
+import { TeamLogo } from "@/components/ui/TeamLogo";
 
 function shortTime(kickoff: string): string {
   const d = new Date(kickoff);
@@ -85,14 +86,7 @@ export function GameCard({ game, index = 0, liveData }: GameCardProps) {
             {/* Away */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <span
-                  className="flex h-7 w-7 items-center justify-center rounded text-[10px] font-black text-white shrink-0"
-                  style={{
-                    background: away.color === "#000000" ? "#222" : away.color,
-                  }}
-                >
-                  {away.abbr}
-                </span>
+                <TeamLogo abbr={away.abbr} size={28} />
                 <span className="text-xs font-semibold truncate text-foreground/80">
                   {away.name}
                 </span>
@@ -116,14 +110,7 @@ export function GameCard({ game, index = 0, liveData }: GameCardProps) {
             {/* Home */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <span
-                  className="flex h-7 w-7 items-center justify-center rounded text-[10px] font-black text-white shrink-0"
-                  style={{
-                    background: home.color === "#000000" ? "#222" : home.color,
-                  }}
-                >
-                  {home.abbr}
-                </span>
+                <TeamLogo abbr={home.abbr} size={28} />
                 <span className="text-xs font-semibold truncate text-foreground/80">
                   {home.name}
                 </span>
