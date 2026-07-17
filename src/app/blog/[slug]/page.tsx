@@ -144,11 +144,19 @@ export default async function BlogPostPage({
         </span>
       </div>
 
-      {post.coverImage && (
-        <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-8 border border-border">
+      <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-8 border border-border bg-secondary">
+        {teams.length > 0 ? (
+          <div className="h-full w-full flex items-center justify-center gap-6 bg-gradient-to-br from-secondary to-secondary/60">
+            {teams.slice(0, 2).map((abbr) => (
+              <TeamLogo key={abbr} abbr={abbr} size={96} className="drop-shadow-xl" />
+            ))}
+          </div>
+        ) : post.coverImage ? (
           <Image src={post.coverImage} alt={post.title} fill className="object-cover" />
-        </div>
-      )}
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
+        )}
+      </div>
 
       <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: post.content }} />
 

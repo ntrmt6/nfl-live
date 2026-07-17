@@ -44,19 +44,19 @@ export function BlogCard({
         <article className="flex gap-3 py-2.5 border-b border-border/40 last:border-0">
           {/* Thumbnail */}
           <div className="relative h-16 w-24 shrink-0 rounded overflow-hidden bg-secondary">
-            {post.coverImage ? (
+            {teams.length > 0 ? (
+              <div className="h-full w-full flex items-center justify-center gap-1 bg-secondary">
+                {teams.slice(0, 2).map((abbr) => (
+                  <TeamLogo key={abbr} abbr={abbr} size={28} />
+                ))}
+              </div>
+            ) : post.coverImage ? (
               <Image
                 src={post.coverImage}
                 alt={post.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-            ) : teams.length > 0 ? (
-              <div className="h-full w-full flex items-center justify-center gap-1 bg-secondary">
-                {teams.slice(0, 2).map((abbr) => (
-                  <TeamLogo key={abbr} abbr={abbr} size={28} />
-                ))}
-              </div>
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
             )}
@@ -86,19 +86,19 @@ export function BlogCard({
       <article className="h-full bg-card border border-border rounded card-hover overflow-hidden">
         {/* Cover image / team logos fallback */}
         <div className="relative aspect-[16/9] bg-secondary overflow-hidden">
-          {post.coverImage ? (
+          {teams.length > 0 ? (
+            <div className="h-full w-full flex items-center justify-center gap-4 bg-gradient-to-br from-secondary to-secondary/60">
+              {teams.slice(0, 2).map((abbr) => (
+                <TeamLogo key={abbr} abbr={abbr} size={56} className="drop-shadow-lg" />
+              ))}
+            </div>
+          ) : post.coverImage ? (
             <Image
               src={post.coverImage}
               alt={post.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
-          ) : teams.length > 0 ? (
-            <div className="h-full w-full flex items-center justify-center gap-4 bg-gradient-to-br from-secondary to-secondary/60">
-              {teams.slice(0, 2).map((abbr) => (
-                <TeamLogo key={abbr} abbr={abbr} size={56} className="drop-shadow-lg" />
-              ))}
-            </div>
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
           )}
