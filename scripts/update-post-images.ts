@@ -5,7 +5,7 @@ import Post from "../src/models/Post";
 import Game from "../src/models/Game";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hdnfltv.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://nflpredicts.com";
 
 async function run() {
   await mongoose.connect(MONGODB_URI);

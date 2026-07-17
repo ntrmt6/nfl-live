@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /api/admin/
 Disallow: /api/settings/
 
-Sitemap: https://hdnfltv.com/sitemap.xml
+Sitemap: https://nflpredicts.com/sitemap.xml
