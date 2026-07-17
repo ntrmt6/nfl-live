@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import Post from "@/models/Post";
 import { Badge } from "@/components/ui/badge";
 import { PostRowActions } from "@/components/admin/PostRowActions";
+import { GenerateMatchupPostsButton } from "@/components/admin/GenerateMatchupPostsButton";
 
 async function getPosts() {
   try {
@@ -22,13 +23,16 @@ export default async function AdminBlogPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Blog Posts</h1>
-        <Link
-          href="/admin/blog/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
-        >
-          <Plus className="h-4 w-4" />
-          New Post
-        </Link>
+        <div className="flex items-center gap-2">
+          <GenerateMatchupPostsButton />
+          <Link
+            href="/admin/blog/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            <Plus className="h-4 w-4" />
+            New Post
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border overflow-x-auto">
