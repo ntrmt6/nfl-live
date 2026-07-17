@@ -5,6 +5,9 @@ import { CalendarDays, MapPin, Tv, ChevronLeft, TrendingUp } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { MatchupPredictionDetail } from "@/components/predictions/MatchupPredictionDetail";
 import { TeamLogo } from "@/components/ui/TeamLogo";
+import { WisdomOfCrowd } from "@/components/game/WisdomOfCrowd";
+import { PickWidget } from "@/components/game/PickWidget";
+import { BoldPrediction } from "@/components/game/BoldPrediction";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -164,6 +167,33 @@ export default async function GamePage({
               <TeamBlock abbr={home.abbr} name={home.name} score={game.homeScore} isWinner={prediction?.predictedWinner === game.homeTeam} />
             </div>
           </div>
+
+          <WisdomOfCrowd
+            gameSlug={game.slug}
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+          />
+
+          <PickWidget
+            gameSlug={game.slug}
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+            gameStatus={game.status}
+          />
+
+          <BoldPrediction
+            gameSlug={game.slug}
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+            homeWinPct={prediction?.homeWinProbability ? prediction.homeWinProbability * 100 : undefined}
+            awayWinPct={prediction?.awayWinProbability ? prediction.awayWinProbability * 100 : undefined}
+          />
 
           {prediction && (
             <div className="rounded-xl border border-border bg-card p-5 space-y-3">
