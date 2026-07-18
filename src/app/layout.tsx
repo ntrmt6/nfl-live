@@ -71,6 +71,13 @@ export const metadata: Metadata = {
     description:
       "AI-powered NFL game predictions, win probabilities, key stats, and full 2026 schedule coverage.",
   },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   robots: {
     index: true,
     follow: true,

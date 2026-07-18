@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Dark background -->
+  <rect width="32" height="32" rx="7" fill="#0a0a0b"/>
+  <!-- Football body -->
+  <ellipse cx="16" cy="16" rx="10" ry="7" fill="#ff7600" rx="10"/>
+  <!-- Laces background strip -->
+  <rect x="14" y="11" width="4" height="10" rx="1" fill="#1a0a00" opacity="0.5"/>
+  <!-- Laces -->
+  <line x1="16" y1="12" x2="16" y2="20" stroke="#fff" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="14" y1="13.5" x2="18" y2="13.5" stroke="#fff" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="14" y1="16" x2="18" y2="16" stroke="#fff" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="14" y1="18.5" x2="18" y2="18.5" stroke="#fff" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Seam lines -->
+  <path d="M6.5 14 Q10 11 13 12" stroke="#cc5500" stroke-width="0.7" stroke-linecap="round" fill="none"/>
+  <path d="M6.5 18 Q10 21 13 20" stroke="#cc5500" stroke-width="0.7" stroke-linecap="round" fill="none"/>
+  <path d="M25.5 14 Q22 11 19 12" stroke="#cc5500" stroke-width="0.7" stroke-linecap="round" fill="none"/>
+  <path d="M25.5 18 Q22 21 19 20" stroke="#cc5500" stroke-width="0.7" stroke-linecap="round" fill="none"/>
+</svg>
