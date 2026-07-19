@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import { PostDTO } from "@/types";
 import { extractTeamsFromText } from "@/lib/teams";
 import { TeamLogo } from "@/components/ui/TeamLogo";
@@ -126,13 +127,9 @@ export function BlogCard({
               <span className="text-border">·</span>
               <span>{dateStr}</span>
             </div>
-            {teams.length > 0 && (
-              <div className="flex items-center gap-1">
-                {teams.slice(0, 2).map((abbr) => (
-                  <TeamLogo key={abbr} abbr={abbr} size={20} />
-                ))}
-              </div>
-            )}
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#FF6200] group-hover:underline shrink-0">
+              Read More <ArrowRight className="h-3 w-3" />
+            </span>
           </div>
         </div>
       </article>

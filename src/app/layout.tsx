@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import Script from "next/script";
+import { unstable_cache } from "next/cache";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -11,15 +11,19 @@ import { organizationSchema, websiteSchema } from "@/lib/schema-org";
 import { connectDB } from "@/lib/db";
 import Settings from "@/models/Settings";
 
-async function getAdsenseClientId(): Promise<string> {
-  try {
-    await connectDB();
-    const settings = await Settings.findOne().lean() as { adsenseClientId?: string } | null;
-    return settings?.adsenseClientId ?? "";
-  } catch {
-    return "";
-  }
-}
+const getAdsenseClientId = unstable_cache(
+  async (): Promise<string> => {
+    try {
+      await connectDB();
+      const settings = await Settings.findOne().lean() as { adsenseClientId?: string } | null;
+      return settings?.adsenseClientId ?? "";
+    } catch {
+      return "";
+    }
+  },
+  ["adsense-client-id"],
+  { revalidate: 3600 }
+);
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -98,16 +102,7 @@ export default async function RootLayout({
   const adsenseClientId = await getAdsenseClientId();
   return (
     <html lang="en" className={roboto.variable}>
-      <head>
-        {adsenseClientId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-            crossOrigin="anonymous"
-            strategy="beforeInteractive"
-          />
-        )}
-      </head>
+      <head />
       <body className="font-sans min-h-screen flex flex-col">
         <AdSenseScript clientId={adsenseClientId} />
         <script

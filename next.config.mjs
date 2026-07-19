@@ -5,6 +5,16 @@ const nextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.nflpredicts.com" }],
+        destination: "https://nflpredicts.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

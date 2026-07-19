@@ -4,6 +4,7 @@ import { BreakingNewsFeed } from "@/components/home/BreakingNewsFeed";
 import { LiveScoresWrapper } from "@/components/home/LiveScoresWrapper";
 import { StandingsWidget } from "@/components/home/StandingsWidget";
 import { LeagueLeaders } from "@/components/home/LeagueLeaders";
+import { BlogTeaser } from "@/components/blog/BlogTeaser";
 
 export const revalidate = 60;
 
@@ -25,9 +26,14 @@ export default async function HomePage() {
             <BreakingNewsFeed posts={posts} />
           </aside>
 
-          {/* CENTER COLUMN — Featured + Schedule */}
+          {/* CENTER COLUMN — Featured + Schedule + Blog */}
           <main className="flex-1 min-w-0 space-y-5">
+            <h1 className="text-lg font-black tracking-tight text-foreground leading-tight">
+              NFL 2026 Season{" "}
+              <span className="text-[#FF6200]">Live Scores, Predictions & Schedule</span>
+            </h1>
             <LiveScoresWrapper featuredGame={featuredGame} games={games} />
+            {posts.length > 0 && <BlogTeaser posts={posts.slice(0, 3)} />}
           </main>
 
           {/* RIGHT COLUMN — Standings + Leaders */}
