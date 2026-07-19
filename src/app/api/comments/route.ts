@@ -65,8 +65,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: spamCheck.reason }, { status: 429 });
     }
 
-    // new users' first 5 comments go to pending for moderation
-    const status = user.approvedCommentCount < 5 ? "pending" : "approved";
+    // fan-talk posts always auto-approve; new users' first 5 blog comments go to pending
+    const status = postSlug === "fan-talk" ? "approved" : user.approvedCommentCount < 5 ? "pending" : "approved";
 
     const comment = await Comment.create({
       postSlug,

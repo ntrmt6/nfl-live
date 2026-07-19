@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Save, LogOut, Trophy, MessageCircle, Star } from "lucide-react";
+import { Camera, Save, LogOut, Trophy, MessageCircle, Star, Target } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { UserAvatar } from "@/components/comments/UserAvatar";
@@ -9,6 +9,8 @@ import { BadgeDisplay } from "@/components/comments/BadgeDisplay";
 import { RANKS } from "@/lib/badge-system";
 import { useToast } from "@/components/ui/toast";
 import { AuthModal } from "@/components/comments/AuthModal";
+import { MyPicksTab } from "@/components/profile/MyPicksTab";
+import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const { user, setUser, logout, isLoading } = useUser();
@@ -18,6 +20,7 @@ export default function ProfilePage() {
   const [username, setUsername] = useState("");
   const [saving, setSaving] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [activeTab, setActiveTab] = useState<"profile" | "picks">("profile");
 
   if (isLoading) {
     return (
@@ -98,7 +101,32 @@ export default function ProfilePage() {
 
   return (
     <div className="container py-10 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-8">My Profile</h1>
+      <h1 className="text-2xl font-bold mb-6">My Profile</h1>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 p-1 rounded-xl bg-secondary/50 border border-border/60 w-fit">
+        {([
+          { id: "profile", label: "Overview", icon: <Star className="h-3.5 w-3.5" /> },
+          { id: "picks", label: "My Picks", icon: <Target className="h-3.5 w-3.5" /> },
+        ] as const).map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all",
+              activeTab === tab.id
+                ? "bg-card text-foreground shadow-sm border border-border/60"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "picks" && <MyPicksTab />}
+      {activeTab !== "picks" && <>
 
       <div className="glass rounded-2xl border border-border p-6 mb-6">
         <div className="flex items-start gap-5">
@@ -186,6 +214,7 @@ export default function ProfilePage() {
       >
         <LogOut className="h-4 w-4" /> Sign out
       </button>
+      </>}
     </div>
   );
 }

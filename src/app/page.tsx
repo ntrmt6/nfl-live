@@ -5,6 +5,7 @@ import { LiveScoresWrapper } from "@/components/home/LiveScoresWrapper";
 import { StandingsWidget } from "@/components/home/StandingsWidget";
 import { LeagueLeaders } from "@/components/home/LeagueLeaders";
 import { BlogTeaser } from "@/components/blog/BlogTeaser";
+import { FanTalkFeed } from "@/components/home/FanTalkFeed";
 
 export const revalidate = 60;
 
@@ -38,6 +39,7 @@ export default async function HomePage() {
               <div className="flex-1 h-px bg-gradient-to-r from-border/80 to-transparent" />
             </div>
             <LiveScoresWrapper featuredGame={featuredGame} games={games} />
+            <FanTalkFeed />
             {posts.length > 0 && <BlogTeaser posts={posts.slice(0, 3)} />}
           </main>
 
