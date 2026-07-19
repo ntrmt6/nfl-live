@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 224 22% 7%;
-    --foreground: 210 18% 94%;
+    --background: 224 22% 6%;
+    --foreground: 210 18% 95%;
 
-    --card: 222 22% 11%;
-    --card-foreground: 210 18% 94%;
+    --card: 222 22% 10%;
+    --card-foreground: 210 18% 95%;
 
-    --popover: 222 22% 11%;
-    --popover-foreground: 210 18% 94%;
+    --popover: 222 22% 10%;
+    --popover-foreground: 210 18% 95%;
 
     --primary: 23 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 22% 15%;
+    --secondary: 222 22% 14%;
     --secondary-foreground: 210 18% 90%;
 
-    --muted: 222 20% 17%;
-    --muted-foreground: 218 12% 55%;
+    --muted: 222 20% 16%;
+    --muted-foreground: 218 12% 52%;
 
     --accent: 204 100% 50%;
     --accent-foreground: 0 0% 100%;
@@ -28,11 +28,11 @@
     --destructive: 356 82% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 18% 18%;
-    --input: 220 18% 16%;
+    --border: 220 18% 16%;
+    --input: 220 18% 14%;
     --ring: 23 100% 50%;
 
-    --radius: 0.375rem;
+    --radius: 0.5rem;
   }
 }
 
@@ -43,6 +43,10 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02","cv03","cv04","cv11";
     -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,168,255,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 80% 90%, rgba(255,98,0,0.05) 0%, transparent 60%);
+    background-attachment: fixed;
   }
 }
 
@@ -112,11 +116,40 @@
 
   /* Card hover */
   .card-hover {
-    @apply transition-all duration-200 hover:border-primary/30 hover:-translate-y-0.5;
-    box-shadow: 0 0 0 0 transparent;
+    @apply transition-all duration-200 hover:border-primary/40 hover:-translate-y-1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
   .card-hover:hover {
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,98,0,0.15);
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,98,0,0.2), 0 0 20px -10px rgba(255,98,0,0.3);
+  }
+
+  /* Section divider with glow */
+  .section-divider {
+    @apply flex items-center gap-3 mb-4;
+  }
+  .section-divider::after {
+    content: '';
+    @apply flex-1 h-px;
+    background: linear-gradient(90deg, hsl(var(--border)), transparent);
+  }
+
+  /* Gradient border card */
+  .card-gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+  .card-gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,98,0,0.3), transparent 50%, rgba(0,168,255,0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }
 

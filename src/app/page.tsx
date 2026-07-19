@@ -28,10 +28,15 @@ export default async function HomePage() {
 
           {/* CENTER COLUMN — Featured + Schedule + Blog */}
           <main className="flex-1 min-w-0 space-y-5">
-            <h1 className="text-lg font-black tracking-tight text-foreground leading-tight">
-              NFL 2026 Season{" "}
-              <span className="text-[#FF6200]">Live Scores, Predictions & Schedule</span>
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-[#FF6200] to-[#FF8C00]" />
+                <h1 className="text-base font-black tracking-tight text-foreground">
+                  NFL 2026 — <span className="text-gradient">Live Scores, Predictions & Schedule</span>
+                </h1>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-border/80 to-transparent" />
+            </div>
             <LiveScoresWrapper featuredGame={featuredGame} games={games} />
             {posts.length > 0 && <BlogTeaser posts={posts.slice(0, 3)} />}
           </main>

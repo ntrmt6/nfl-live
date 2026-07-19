@@ -84,13 +84,13 @@ export function BlogCard({
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <article className="h-full bg-card border border-border rounded card-hover overflow-hidden">
+      <article className="h-full flex flex-col bg-card border border-border/70 rounded-lg card-hover overflow-hidden">
         {/* Cover image / team logos fallback */}
-        <div className="relative aspect-[16/9] bg-secondary overflow-hidden">
+        <div className="relative aspect-[16/9] bg-secondary overflow-hidden shrink-0">
           {teams.length > 0 ? (
-            <div className="h-full w-full flex items-center justify-center gap-4 bg-gradient-to-br from-secondary to-secondary/60">
+            <div className="h-full w-full flex items-center justify-center gap-6 bg-gradient-to-br from-secondary to-secondary/50">
               {teams.slice(0, 2).map((abbr) => (
-                <TeamLogo key={abbr} abbr={abbr} size={56} className="drop-shadow-lg" />
+                <TeamLogo key={abbr} abbr={abbr} size={64} className="drop-shadow-xl" />
               ))}
             </div>
           ) : post.coverImage ? (
@@ -101,33 +101,34 @@ export function BlogCard({
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/20 to-[#00A8FF]/20" />
+            <div className="h-full w-full bg-gradient-to-br from-[#FF6200]/15 via-background to-[#00A8FF]/15" />
           )}
-        </div>
-
-        {/* Content */}
-        <div className="p-3">
+          {/* Tag overlay on image */}
           {tc && firstTag && (
             <span
-              className="inline-block text-[10px] font-black uppercase px-1.5 py-0.5 rounded mb-2"
-              style={{ background: tc.bg, color: tc.text }}
+              className="absolute top-2.5 left-2.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-full backdrop-blur-sm"
+              style={{ background: tc.bg, color: tc.text, border: `1px solid ${tc.text}30` }}
             >
               {firstTag}
             </span>
           )}
-          <h3 className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-[#FF6200] transition-colors mb-1.5">
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-4">
+          <h3 className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-[#FF6200] transition-colors mb-2">
             {post.title}
           </h3>
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1">
             {post.excerpt}
           </p>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-              <span className="font-medium">{post.author}</span>
-              <span className="text-border">·</span>
+          <div className="flex items-center justify-between gap-2 pt-3 border-t border-border/40">
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
+              <span className="font-semibold">{post.author}</span>
+              <span>·</span>
               <span>{dateStr}</span>
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#FF6200] group-hover:underline shrink-0">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#FF6200] group-hover:gap-2 transition-all shrink-0">
               Read More <ArrowRight className="h-3 w-3" />
             </span>
           </div>

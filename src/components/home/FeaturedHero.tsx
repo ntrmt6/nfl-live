@@ -67,98 +67,93 @@ export function FeaturedHero({ game, liveScores }: FeaturedHeroProps) {
         </div>
 
         {/* Split-screen matchup */}
-        <div className="flex min-h-[180px]">
+        <div className="flex min-h-[220px]">
           {/* Away team half */}
           <div
-            className="relative flex-1 flex flex-col items-center justify-center py-8 px-4 overflow-hidden"
+            className="relative flex-1 flex flex-col items-center justify-center py-10 px-6 overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${away.color}55 0%, ${away.color}20 60%, transparent 100%)`,
+              background: `linear-gradient(135deg, ${away.color}40 0%, ${away.color}15 60%, transparent 100%)`,
             }}
           >
-            {/* Subtle large abbr watermark */}
             <span
-              className="absolute inset-0 flex items-center justify-center text-[6rem] font-black opacity-[0.04] select-none pointer-events-none"
+              className="absolute inset-0 flex items-center justify-center text-[8rem] font-black opacity-[0.035] select-none pointer-events-none"
               aria-hidden
               style={{ color: away.color }}
             >
               {away.abbr}
             </span>
 
-            {/* Team logo */}
-            <TeamLogo abbr={away.abbr} size={56} className="mb-2 drop-shadow-lg" />
+            <TeamLogo abbr={away.abbr} size={72} className="mb-3 drop-shadow-xl" />
 
-            <span className="text-4xl font-black tracking-tighter text-foreground leading-none mb-1">
+            <span className="text-3xl font-black tracking-tighter text-foreground leading-none mb-1">
               {away.abbr}
             </span>
-            <span className="text-[10px] text-muted-foreground text-center leading-tight">
+            <span className="text-xs text-muted-foreground text-center leading-tight font-medium">
               {away.name}
             </span>
 
-            {/* Score if live/halftime/final */}
             {(isLive || isHalftime || isFinal) && (
               <span className={cn(
-                "mt-2 text-2xl font-black tabular-nums",
+                "mt-3 text-4xl font-black tabular-nums leading-none",
                 (isLive || isHalftime) && awayScore > homeScore ? "text-[#FF6200]" : "text-foreground"
               )}>
                 {awayScore}
               </span>
             )}
 
-            <span className="mt-1 text-[10px] text-muted-foreground/50 uppercase tracking-wide">
+            <span className="mt-2 text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold">
               Away
             </span>
           </div>
 
-          {/* Center divider with VS */}
-          <div className="flex flex-col items-center justify-center z-10 px-2 shrink-0">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-px w-px" />
-              <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-background border border-border text-[11px] font-black text-foreground/70 shadow">
+          {/* Center divider */}
+          <div className="flex flex-col items-center justify-center z-10 px-3 shrink-0 gap-2">
+            <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-background border-2 border-border text-[11px] font-black text-foreground/80 shadow-lg">
                 VS
               </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50 bg-secondary/60 px-2 py-0.5 rounded-full border border-border/50">
                 Wk {game.week}
               </span>
             </div>
+            <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
           </div>
 
           {/* Home team half */}
           <div
-            className="relative flex-1 flex flex-col items-center justify-center py-8 px-4 overflow-hidden"
+            className="relative flex-1 flex flex-col items-center justify-center py-10 px-6 overflow-hidden"
             style={{
-              background: `linear-gradient(225deg, ${home.color}55 0%, ${home.color}20 60%, transparent 100%)`,
+              background: `linear-gradient(225deg, ${home.color}40 0%, ${home.color}15 60%, transparent 100%)`,
             }}
           >
-            {/* Subtle large abbr watermark */}
             <span
-              className="absolute inset-0 flex items-center justify-center text-[6rem] font-black opacity-[0.04] select-none pointer-events-none"
+              className="absolute inset-0 flex items-center justify-center text-[8rem] font-black opacity-[0.035] select-none pointer-events-none"
               aria-hidden
               style={{ color: home.color }}
             >
               {home.abbr}
             </span>
 
-            {/* Team logo */}
-            <TeamLogo abbr={home.abbr} size={56} className="mb-2 drop-shadow-lg" />
+            <TeamLogo abbr={home.abbr} size={72} className="mb-3 drop-shadow-xl" />
 
-            <span className="text-4xl font-black tracking-tighter text-foreground leading-none mb-1">
+            <span className="text-3xl font-black tracking-tighter text-foreground leading-none mb-1">
               {home.abbr}
             </span>
-            <span className="text-[10px] text-muted-foreground text-center leading-tight">
+            <span className="text-xs text-muted-foreground text-center leading-tight font-medium">
               {home.name}
             </span>
 
-            {/* Score if live/halftime/final */}
             {(isLive || isHalftime || isFinal) && (
               <span className={cn(
-                "mt-2 text-2xl font-black tabular-nums",
+                "mt-3 text-4xl font-black tabular-nums leading-none",
                 (isLive || isHalftime) && homeScore > awayScore ? "text-[#FF6200]" : "text-foreground"
               )}>
                 {homeScore}
               </span>
             )}
 
-            <span className="mt-1 text-[10px] text-muted-foreground/50 uppercase tracking-wide">
+            <span className="mt-2 text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold">
               Home
             </span>
           </div>
