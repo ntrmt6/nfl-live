@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import Game from "@/models/Game";
 import { gameSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { resolvePicksForGame } from "@/lib/resolvePicks";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -32,6 +33,12 @@ export async function PUT(req: NextRequest, { params }: Params) {
     await connectDB();
     const game = await Game.findByIdAndUpdate(id, parsed, { new: true });
     if (!game) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Auto-resolve picks whenever a game is saved as final with scores
+    if (parsed.status === "final") {
+      resolvePicksForGame(game.slug).catch(() => {});
+    }
+
     return NextResponse.json({ game });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 400 });

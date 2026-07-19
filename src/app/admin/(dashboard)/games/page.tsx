@@ -5,6 +5,7 @@ import Game from "@/models/Game";
 import { getTeam } from "@/lib/teams";
 import { formatGameTime } from "@/lib/utils";
 import { GameRowActions } from "@/components/admin/GameRowActions";
+import { ResolvePicksButton } from "@/components/admin/ResolvePicksButton";
 
 async function getGames() {
   try {
@@ -23,13 +24,16 @@ export default async function AdminGamesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Games</h1>
-        <Link
-          href="/admin/games/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
-        >
-          <Plus className="h-4 w-4" />
-          New Game
-        </Link>
+        <div className="flex items-center gap-2">
+          <ResolvePicksButton />
+          <Link
+            href="/admin/games/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            <Plus className="h-4 w-4" />
+            New Game
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border overflow-x-auto">
