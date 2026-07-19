@@ -65,3 +65,31 @@ export async function getAllPostsForSitemap(): Promise<{ slug: string; updatedAt
     return [];
   }
 }
+
+export async function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): Promise<PostDTO[]> {
+  try {
+    await connectDB();
+    const posts = await Post.find({
+      published: true,
+      slug: { $ne: currentSlug },
+      tags: { $in: tags },
+    })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    if (posts.length < limit) {
+      const more = await Post.find({
+        published: true,
+        slug: { $ne: currentSlug },
+        _id: { $nin: posts.map((p: any) => p._id) },
+      })
+        .sort({ createdAt: -1 })
+        .limit(limit - posts.length)
+        .lean();
+      return [...posts, ...more].map(serialize);
+    }
+    return posts.map(serialize);
+  } catch {
+    return [];
+  }
+}

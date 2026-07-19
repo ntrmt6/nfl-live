@@ -13,10 +13,24 @@ export function organizationSchema() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl("/logo.png"),
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/icon.svg"),
+      width: 200,
+      height: 200,
+    },
     description:
       "NFL fan hub featuring AI-powered game predictions, full schedule, matchup analysis, team stats, and expert blog coverage.",
-    sameAs: [],
+    sameAs: [
+      "https://twitter.com/nflpredictshub",
+      "https://www.reddit.com/user/nflpredictshub",
+      "https://www.facebook.com/nflpredictshub",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      url: `${SITE_URL}/contact`,
+    },
   };
 }
 

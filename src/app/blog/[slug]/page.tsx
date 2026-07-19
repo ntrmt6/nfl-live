@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, User, ChevronLeft } from "lucide-react";
-import { getPostBySlug, getAllPostSlugs } from "@/lib/data/posts";
+import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from "@/lib/data/posts";
 import { CommentSection } from "@/components/comments/CommentSection";
+import { BlogCard } from "@/components/blog/BlogCard";
 import { blogPostingSchema, breadcrumbSchema } from "@/lib/schema-org";
 import { absoluteUrl } from "@/lib/utils";
 import { extractTeamsFromText } from "@/lib/teams";
@@ -62,6 +63,7 @@ export default async function BlogPostPage({
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
+  const relatedPosts = await getRelatedPosts(slug, post.tags, 3);
   const jsonLd = blogPostingSchema(post as any);
   const breadcrumb = breadcrumbSchema([
     { name: "Home", url: "/" },
@@ -159,6 +161,17 @@ export default async function BlogPostPage({
       </div>
 
       <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+      {relatedPosts.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-border">
+          <h2 className="text-lg font-bold mb-4">Related Articles</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {relatedPosts.map((p) => (
+              <BlogCard key={p._id} post={p} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-12 pt-8 border-t border-border">
         <CommentSection postSlug={slug} />
