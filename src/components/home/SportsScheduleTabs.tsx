@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Search, CalendarDays, Loader2, RefreshCw, ExternalLink } from "lucide-react";
+// ExternalLink kept for the CFB full-predictions link below
 import { ScheduleGrid } from "@/components/home/ScheduleGrid";
 import { GameDTO } from "@/types";
 import { CollegeGameDTO } from "@/models/CollegeGame";
@@ -82,17 +83,17 @@ function statusLabel(status: EspnGame["status"]): { text: string; variant: "live
   return { text: status.type.shortDetail || new Date(status.type.shortDetail).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }), variant: "upcoming" };
 }
 
-// ── Generic ESPN game card ─────────────────────────────────────
+// ── Generic ESPN game card (links to internal sport page) ─────
 function EspnGameCard({ game, league }: { game: EspnGame; league: League }) {
   const { text: statusText, variant } = statusLabel(game.status);
   const isLive = variant === "live";
   const isFinal = variant === "final";
   const kickoff = new Date(game.date);
-  const espnLink = game.links?.[0]?.href;
+  const internalHref = `/sport/${league.id}/${game.id}`;
 
-  return (
+  const cardContent = (
     <div className={cn(
-      "rounded-xl border bg-card overflow-hidden transition-all hover:shadow-md",
+      "rounded-xl border bg-card overflow-hidden transition-all hover:shadow-md hover:border-[#FF6200]/40",
       isLive ? "border-red-500/40 shadow-sm shadow-red-500/10" : "border-border"
     )}>
       {/* Status bar */}
@@ -132,14 +133,12 @@ function EspnGameCard({ game, league }: { game: EspnGame; league: League }) {
           {!isLive && !isFinal && kickoff.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
           {(isLive || isFinal) && game.venue && <span className="truncate">{game.venue}</span>}
         </span>
-        {espnLink && (
-          <a href={espnLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-[#FF6200] transition-colors">
-            ESPN <ExternalLink className="h-2.5 w-2.5" />
-          </a>
-        )}
+        <span className="text-[10px] text-[#FF6200] font-semibold">AI Prediction →</span>
       </div>
     </div>
   );
+
+  return <Link href={internalHref}>{cardContent}</Link>;
 }
 
 // ── CFB card (links internally) ────────────────────────────────
