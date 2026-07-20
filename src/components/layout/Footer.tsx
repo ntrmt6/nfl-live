@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Brain, Twitter, Facebook, Youtube } from "lucide-react";
+import { CookieSettingsButton } from "@/components/CookieSettingsButton";
 
 const FOOTER_LINKS = {
   Navigate: [
@@ -14,6 +15,7 @@ const FOOTER_LINKS = {
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/disclaimer", label: "Disclaimer" },
   ],
+
 };
 
 export function Footer() {
@@ -95,6 +97,11 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              {section === "Legal" && (
+                <li>
+                  <CookieSettingsButton />
+                </li>
+              )}
             </ul>
           </div>
         ))}

@@ -7,6 +7,8 @@ import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/components/ui/toast";
 import { AdSenseScript } from "@/components/AdSenseScript";
 import { UserProvider } from "@/context/UserContext";
+import { CookieConsentProvider } from "@/context/CookieConsentContext";
+import { CookieConsent } from "@/components/CookieConsent";
 import { organizationSchema, websiteSchema } from "@/lib/schema-org";
 import { connectDB } from "@/lib/db";
 import Settings from "@/models/Settings";
@@ -113,13 +115,16 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }}
         />
-        <ToastProvider>
-          <UserProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </UserProvider>
-        </ToastProvider>
+        <CookieConsentProvider>
+          <ToastProvider>
+            <UserProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <CookieConsent />
+            </UserProvider>
+          </ToastProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );
