@@ -41,7 +41,7 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-2">
             <a
-              href="https://twitter.com/nflpredictshub"
+              href="https://x.com/Nflpredictsml"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Twitter"
@@ -50,7 +50,7 @@ export function Footer() {
               <Twitter className="h-4 w-4" />
             </a>
             <a
-              href="https://www.facebook.com/nflpredictshub"
+              href="https://www.facebook.com/share/1GJWAcF2xa/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -70,7 +70,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="https://youtube.com/@nflpredictshub"
+              href="https://m.youtube.com/@nflpredictshub"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
