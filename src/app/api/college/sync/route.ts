@@ -233,11 +233,6 @@ export async function GET(req: NextRequest) {
     espnDates = `${start}-${end}`;
   }
 
-  const fakeReq = new NextRequest(req.url, {
-    method: "POST",
-    body: JSON.stringify({ dates: `${start}-${end}` }),
-  });
-  // Re-use POST logic — call with admin bypass
   // For cron, generate predictions directly
   try {
     const events = await fetchEspnSchedule(espnDates);
