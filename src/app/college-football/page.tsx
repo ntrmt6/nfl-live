@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { TrendingUp, Trophy, Brain, Filter } from "lucide-react";
+import { TrendingUp, Trophy, Brain, Target, Layers, CalendarDays, GraduationCap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getUpcomingCollegeGames } from "@/lib/data/college-games";
 import { getAllCollegePredictions } from "@/lib/data/college-predictions";
@@ -184,7 +184,7 @@ export default async function CollegeFootballPage() {
       {/* Hero */}
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-3">
-          <Badge variant="neon" className="text-xs">🏈 COLLEGE FOOTBALL</Badge>
+          <Badge variant="neon" className="text-xs flex items-center gap-1"><GraduationCap className="h-3 w-3" /> COLLEGE FOOTBALL</Badge>
           <Badge variant="secondary" className="text-xs">2026 SEASON</Badge>
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3">
@@ -197,10 +197,10 @@ export default async function CollegeFootballPage() {
         {/* Stats row */}
         <div className="flex flex-wrap gap-4 mt-6">
           {[
-            { icon: "🤖", label: "ML Model", value: "XGBoost" },
-            { icon: "📅", label: "Training Data", value: "2019–2025" },
-            { icon: "🎯", label: "Model Accuracy", value: "~68%" },
-            { icon: "📊", label: "Factors Analyzed", value: "7 Layers" },
+            { icon: <Brain className="h-4 w-4 text-[#FF6200]" />, label: "ML Model", value: "XGBoost" },
+            { icon: <CalendarDays className="h-4 w-4 text-[#FF6200]" />, label: "Training Data", value: "2019–2025" },
+            { icon: <Target className="h-4 w-4 text-[#FF6200]" />, label: "Model Accuracy", value: "~68%" },
+            { icon: <Layers className="h-4 w-4 text-[#FF6200]" />, label: "Factors Analyzed", value: "7 Layers" },
           ].map(s => (
             <div key={s.label} className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
               <span>{s.icon}</span>

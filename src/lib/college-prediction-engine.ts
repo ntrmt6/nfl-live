@@ -7,7 +7,7 @@ import {
 export interface ConditionLayer {
   id: string;
   label: string;
-  emoji: string;
+  icon: string;
   homeScore: number;   // 0-100 how favorable for home
   awayScore: number;   // 0-100 how favorable for away
   weight: number;      // contribution weight (sums to 1.0)
@@ -180,7 +180,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "historical_strength",
     label: "Historical Strength (2019–2025)",
-    emoji: "🏆",
+    icon: "Trophy",
     homeScore: homeRating,
     awayScore: awayRating,
     weight: 0.30,
@@ -200,7 +200,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "current_form",
     label: "Current Season Form",
-    emoji: "📈",
+    icon: "TrendingUp",
     homeScore: homeFormScore,
     awayScore: awayFormScore,
     weight: 0.20,
@@ -221,7 +221,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "head_to_head",
     label: "Head-to-Head History (2019–2025)",
-    emoji: "⚔️",
+    icon: "Swords",
     homeScore: Math.round(homeH2HPct),
     awayScore: Math.round(awayH2HPct),
     weight: 0.15,
@@ -240,7 +240,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "home_field",
     label: "Home Field Advantage",
-    emoji: "🏠",
+    icon: "Home",
     homeScore: homeFieldScore,
     awayScore: awayFieldScore,
     weight: isNeutralSite ? 0.0 : 0.12,
@@ -264,7 +264,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "offense_defense",
     label: "Offensive vs Defensive Matchup",
-    emoji: "🎯",
+    icon: "Target",
     homeScore: Math.round(homeOffScore),
     awayScore: Math.round(awayOffScore),
     weight: 0.12,
@@ -286,7 +286,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "conference_sos",
     label: "Conference Strength & Schedule Quality",
-    emoji: "🏛️",
+    icon: "Building2",
     homeScore: homeConfScore,
     awayScore: awayConfScore,
     weight: 0.07,
@@ -317,7 +317,7 @@ export function generateCollegePrediction(
   layers.push({
     id: "rankings",
     label: "AP Rankings & Program Prestige",
-    emoji: "📊",
+    icon: "BarChart3",
     homeScore: homeRankScore,
     awayScore: awayRankScore,
     weight: 0.04,

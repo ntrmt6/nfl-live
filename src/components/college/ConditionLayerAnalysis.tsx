@@ -1,8 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  ChevronDown, ChevronUp, TrendingUp, Minus,
+  Trophy, TrendingDown, Swords, Home, Target,
+  Building2, BarChart3, Brain, Layers, CalendarDays,
+  type LucideIcon,
+} from "lucide-react";
 import { ConditionLayer, H2HRecord } from "@/lib/college-prediction-engine";
+
+const LAYER_ICONS: Record<string, LucideIcon> = {
+  Trophy, TrendingUp, TrendingDown, Swords, Home,
+  Target, Building2, BarChart3, Brain, Layers,
+  CalendarDays, Minus,
+};
+
+function LayerIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = LAYER_ICONS[name] || BarChart3;
+  return <Icon className={className ?? "h-4 w-4"} />;
+}
 
 interface Props {
   layers: ConditionLayer[];
@@ -67,7 +83,9 @@ function LayerCard({ layer, homeFull, awayFull, defaultOpen = false }: {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 p-4 text-left hover:bg-secondary/30 transition-colors"
       >
-        <span className="text-xl shrink-0">{layer.emoji}</span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary/60 text-[#FF6200]">
+          <LayerIcon name={layer.icon} className="h-4 w-4" />
+        </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-sm">{layer.label}</span>
@@ -127,7 +145,8 @@ function H2HTimeline({ h2h, homeAbbr, awayAbbr, homeFull, awayFull }: {
     <div className="rounded-xl border border-border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm flex items-center gap-2">
-          <span className="text-lg">⚔️</span> Series History (2019–2024)
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-secondary/60 text-[#FF6200]"><Swords className="h-3.5 w-3.5" /></span>
+          Series History (2019–2024)
         </h3>
         <div className="flex items-center gap-3 text-sm font-bold">
           <span className="text-blue-400">{homeWins}</span>
@@ -217,7 +236,7 @@ export function ConditionLayerAnalysis({
       {/* ── Model Summary ── */}
       <div className="rounded-xl border border-border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-2xl">🤖</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF6200]/10 border border-[#FF6200]/20 text-[#FF6200]"><Brain className="h-5 w-5" /></span>
           <div>
             <h2 className="font-bold text-lg">AI Condition Layer Analysis</h2>
             <p className="text-xs text-muted-foreground">XGBoost ML model trained on 2019–2025 CFB seasons · {confidence}% confidence</p>
@@ -249,7 +268,7 @@ export function ConditionLayerAnalysis({
 
         {/* Model pick */}
         <div className="flex items-center gap-3 rounded-lg bg-[#FF6200]/8 border border-[#FF6200]/20 p-3">
-          <span className="text-2xl">🏆</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF6200]/15 text-[#FF6200]"><Trophy className="h-5 w-5" /></span>
           <div className="flex-1">
             <p className="text-[11px] text-muted-foreground font-semibold">MODEL PICK</p>
             <p className="font-bold text-base">{winnerFull}</p>
@@ -280,7 +299,8 @@ export function ConditionLayerAnalysis({
       {/* ── Condition Layers ── */}
       <div className="space-y-3">
         <h3 className="font-bold flex items-center gap-2 text-sm text-muted-foreground uppercase tracking-wider">
-          <span>📋</span> Condition Layers ({layers.length} factors analyzed)
+          <span className="flex h-5 w-5 items-center justify-center text-[#FF6200]"><Layers className="h-4 w-4" /></span>
+          Condition Layers ({layers.length} factors analyzed)
         </h3>
         {layers.map((layer, i) => (
           <LayerCard
@@ -305,7 +325,8 @@ export function ConditionLayerAnalysis({
       {/* ── Season-by-season breakdown ── */}
       <div>
         <h3 className="font-bold flex items-center gap-2 text-sm text-muted-foreground uppercase tracking-wider mb-3">
-          <span>📅</span> 6-Season Program History (2019–2024)
+          <span className="flex h-5 w-5 items-center justify-center text-[#FF6200]"><CalendarDays className="h-4 w-4" /></span>
+          6-Season Program History (2019–2024)
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SeasonBreakdown records={seasonRecords.home} teamFull={homeFull} color="blue" />

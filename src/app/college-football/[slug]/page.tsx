@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, CalendarDays, Tv, MapPin, Brain } from "lucide-react";
+import { ChevronLeft, CalendarDays, Tv, MapPin, Brain, GraduationCap, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getCollegeGameBySlug, getAllCollegeGameSlugs } from "@/lib/data/college-games";
 import { getCollegePredictionForGame, getCollegePredictionBySlug } from "@/lib/data/college-predictions";
@@ -59,7 +59,7 @@ function TeamBlock({ abbr, name, logoSrc, conference, isWinner }: {
       <div>
         <p className="font-semibold text-sm">{name}</p>
         <p className="text-[10px] text-muted-foreground">{conference}</p>
-        {isWinner && <p className="text-[10px] text-[#FF6200] font-bold">🤖 MODEL PICK</p>}
+        {isWinner && <p className="text-[10px] text-[#FF6200] font-bold flex items-center gap-1"><Brain className="h-2.5 w-2.5" /> MODEL PICK</p>}
       </div>
     </div>
   );
@@ -114,7 +114,7 @@ export default async function CollegeGamePage({
           {/* Header */}
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <Badge variant="neon" className="text-[10px]">🏈 COLLEGE FOOTBALL</Badge>
+              <Badge variant="neon" className="text-[10px] flex items-center gap-1"><GraduationCap className="h-3 w-3" /> COLLEGE FOOTBALL</Badge>
               {game.isBowlGame ? (
                 <Badge variant="live" className="text-[10px]">{game.bowlName || "BOWL GAME"}</Badge>
               ) : (
@@ -167,7 +167,7 @@ export default async function CollegeGamePage({
               {(game.venue || game.city) && (
                 <InfoRow icon={<MapPin className="h-4 w-4" />} label="Venue" value={[game.venue, game.city].filter(Boolean).join(", ")} />
               )}
-              <InfoRow icon={<span className="text-sm">🏛️</span>} label="Stadium" value={home.stadium || "TBD"} />
+              <InfoRow icon={<Building2 className="h-4 w-4" />} label="Stadium" value={home.stadium || "TBD"} />
             </div>
           </div>
         </div>
