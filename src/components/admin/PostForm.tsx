@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +42,36 @@ export function PostForm({ initialValues }: { initialValues?: Partial<PostFormVa
   const [values, setValues] = useState<PostFormValues>({ ...DEFAULT_VALUES, ...initialValues });
   const [tagsInput, setTagsInput] = useState((initialValues?.tags || []).join(", "));
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [editorKey, setEditorKey] = useState(0);
 
   const isEdit = Boolean(initialValues?._id);
+
+  const handleGenerate = async () => {
+    if (!values.title.trim() || generating) return;
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/admin/generate-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: values.title }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast({ title: data.error ?? "Generation failed", variant: "error" }); return; }
+      update("excerpt", data.excerpt);
+      update("content", data.content);
+      update("tags", data.tags);
+      update("metaTitle", data.metaTitle);
+      update("metaDescription", data.metaDescription);
+      setTagsInput(data.tags.join(", "));
+      setEditorKey((k) => k + 1);
+      toast({ title: "Post generated — review and publish", variant: "success" });
+    } catch {
+      toast({ title: "Failed to generate post.", variant: "error" });
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const update = <K extends keyof PostFormValues>(key: K, value: PostFormValues[K]) => {
     setValues((v) => ({ ...v, [key]: value }));
@@ -82,7 +110,12 @@ export function PostForm({ initialValues }: { initialValues?: Partial<PostFormVa
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div className="space-y-1.5">
         <Label>Title</Label>
-        <Input value={values.title} onChange={(e) => update("title", e.target.value)} required />
+        <div className="flex gap-2">
+          <Input value={values.title} onChange={(e) => update("title", e.target.value)} required className="flex-1" />
+          <Button type="button" variant="outline" onClick={handleGenerate} disabled={generating || !values.title.trim()}>
+            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : "✨ Auto Generate"}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-1.5">
@@ -92,7 +125,7 @@ export function PostForm({ initialValues }: { initialValues?: Partial<PostFormVa
 
       <div className="space-y-1.5">
         <Label>Content</Label>
-        <WysiwygEditor content={values.content} onChange={(html) => update("content", html)} />
+        <WysiwygEditor key={editorKey} content={values.content} onChange={(html) => update("content", html)} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
