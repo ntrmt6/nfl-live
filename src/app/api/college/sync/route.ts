@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const secret = searchParams.get("secret");
-  if (secret !== process.env.CRON_SECRET && secret !== process.env.ADMIN_SECRET) {
+  if (secret !== process.env.CRON_SECRET && secret !== process.env.ADMIN_SECRET && secret !== process.env.JWT_SECRET) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

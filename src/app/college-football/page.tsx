@@ -61,7 +61,6 @@ function TeamLogo({ src, abbr, size = 40 }: { src?: string; abbr: string; size?:
       width={size}
       height={size}
       className="object-contain"
-      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
     />
   );
 }
