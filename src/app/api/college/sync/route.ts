@@ -221,10 +221,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Fetch next 4 weeks worth of games
-  const now = new Date();
-  const start = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const end = new Date(now.getTime() + 28 * 86400000).toISOString().slice(0, 10).replace(/-/g, "");
+  // Use provided dates param or default to next 16 weeks (CFB season)
+  const datesParam = searchParams.get("dates");
+  let espnDates: string | undefined;
+  if (datesParam) {
+    espnDates = datesParam;
+  } else {
+    const now = new Date();
+    const start = now.toISOString().slice(0, 10).replace(/-/g, "");
+    const end = new Date(now.getTime() + 112 * 86400000).toISOString().slice(0, 10).replace(/-/g, "");
+    espnDates = `${start}-${end}`;
+  }
 
   const fakeReq = new NextRequest(req.url, {
     method: "POST",
@@ -233,7 +240,7 @@ export async function GET(req: NextRequest) {
   // Re-use POST logic — call with admin bypass
   // For cron, generate predictions directly
   try {
-    const events = await fetchEspnSchedule(`${start}-${end}`);
+    const events = await fetchEspnSchedule(espnDates);
     await connectDB();
 
     let synced = 0;
