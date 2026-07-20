@@ -1,20 +1,23 @@
 import type { MetadataRoute } from "next";
 import { getAllGamesForSitemap } from "@/lib/data/games";
 import { getAllPostsForSitemap } from "@/lib/data/posts";
+import { getAllCollegeGameSlugs } from "@/lib/data/college-games";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const BUILT_AT = new Date();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [games, posts] = await Promise.all([
+  const [games, posts, collegeSlugs] = await Promise.all([
     getAllGamesForSitemap(),
     getAllPostsForSitemap(),
+    getAllCollegeGameSlugs(),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`,             lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 1.0 },
-    { url: `${SITE_URL}/predictions`,  lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.95 },
-    { url: `${SITE_URL}/blog`,         lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.85 },
+    { url: `${SITE_URL}/predictions`,       lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.95 },
+    { url: `${SITE_URL}/college-football`, lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.93 },
+    { url: `${SITE_URL}/blog`,             lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.85 },
     { url: `${SITE_URL}/leaderboard`,  lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.7 },
     { url: `${SITE_URL}/contact`,      lastModified: new Date("2026-07-01"), changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`,      lastModified: new Date("2026-07-01"), changeFrequency: "yearly",  priority: 0.2 },
@@ -40,5 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
-  return [...staticRoutes, ...gameRoutes, ...postRoutes];
+  const collegeRoutes: MetadataRoute.Sitemap = collegeSlugs.map(slug => ({
+    url: `${SITE_URL}/college-football/${slug}`,
+    lastModified: BUILT_AT,
+    changeFrequency: "weekly" as const,
+    priority: 0.80,
+  }));
+
+  return [...staticRoutes, ...gameRoutes, ...postRoutes, ...collegeRoutes];
 }
