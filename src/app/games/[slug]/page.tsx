@@ -8,6 +8,7 @@ import { TeamLogo } from "@/components/ui/TeamLogo";
 import { WisdomOfCrowd } from "@/components/game/WisdomOfCrowd";
 import { PickWidget } from "@/components/game/PickWidget";
 import { BoldPrediction } from "@/components/game/BoldPrediction";
+import { SharePredictionButtons } from "@/components/game/SharePredictionButtons";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -206,6 +207,27 @@ export default async function GamePage({
                 <QuickStat label="Model Accuracy" value={`${prediction.modelAccuracy}%`} />
               )}
             </div>
+          )}
+
+          {prediction && (
+            <SharePredictionButtons
+              away={game.awayTeam}
+              home={game.homeTeam}
+              awayFull={game.awayTeamFull}
+              homeFull={game.homeTeamFull}
+              awayProb={Math.round((prediction.awayWinProbability ?? 0.5) * 100)}
+              homeProb={Math.round((prediction.homeWinProbability ?? 0.5) * 100)}
+              winner={prediction.predictedWinner ?? game.homeTeam}
+              confidence={prediction.confidence ?? 0}
+              week={game.week}
+              awayPPG={prediction.awayTeamStats?.pts_for != null ? prediction.awayTeamStats.pts_for.toFixed(1) : undefined}
+              homePPG={prediction.homeTeamStats?.pts_for != null ? prediction.homeTeamStats.pts_for.toFixed(1) : undefined}
+              awayDef={prediction.awayTeamStats?.pts_against != null ? prediction.awayTeamStats.pts_against.toFixed(1) : undefined}
+              homeDef={prediction.homeTeamStats?.pts_against != null ? prediction.homeTeamStats.pts_against.toFixed(1) : undefined}
+              awayWR={prediction.awayTeamStats?.win_rate != null ? (prediction.awayTeamStats.win_rate * 100).toFixed(0) : undefined}
+              homeWR={prediction.homeTeamStats?.win_rate != null ? (prediction.homeTeamStats.win_rate * 100).toFixed(0) : undefined}
+              gameUrl={absoluteUrl(`/games/${game.slug}`)}
+            />
           )}
 
           <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground leading-relaxed">
