@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { connectDB } from "@/lib/db";
 import Post from "@/models/Post";
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
       coverImage: parsed.coverImage || undefined,
       slug,
     });
+
+    revalidatePath("/blog");
+    revalidatePath("/");
+    if (parsed.published) {
+      revalidatePath(`/blog/${slug}`);
+    }
+
     return NextResponse.json({ post }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 400 });
