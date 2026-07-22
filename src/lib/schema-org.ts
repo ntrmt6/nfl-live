@@ -15,9 +15,9 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
-      url: absoluteUrl("/icon.svg"),
-      width: 200,
-      height: 200,
+      url: absoluteUrl("/icon-192.png"),
+      width: 192,
+      height: 192,
     },
     description:
       "NFL fan hub featuring AI-powered game predictions, full schedule, matchup analysis, team stats, and expert blog coverage.",
@@ -114,7 +114,7 @@ export function matchupPredictionSchema(game: IGame, pred: IPrediction) {
       "@type": "Organization",
       name: SITE_NAME,
       url: SITE_URL,
-      logo: { "@type": "ImageObject", url: absoluteUrl("/logo.png") },
+      logo: { "@type": "ImageObject", url: absoluteUrl("/icon-192.png") },
     },
     about: [
       { "@type": "SportsTeam", name: away.name, sport: "American Football" },
@@ -164,7 +164,7 @@ export function blogPostingSchema(post: IPost) {
       logo: {
         "@type": "ImageObject",
         url: absoluteUrl("/logo.png"),
-        width: 200,
+        width: 60,
         height: 60,
       },
     },
