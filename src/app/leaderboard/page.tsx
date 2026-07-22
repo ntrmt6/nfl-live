@@ -6,13 +6,15 @@ export const metadata: Metadata = {
   description: "See who's on the hottest pick'em streak. The NFL Predictions Hub community leaderboard — ranked by current streak and prediction accuracy.",
 };
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 interface LeaderboardEntry {
   userId: string;
   username: string;
   total: number;
   correct: number;
+  wrong: number;
+  resolved: number;
   accuracy: number;
   streak: number;
   bestStreak: number;
@@ -21,7 +23,7 @@ interface LeaderboardEntry {
 async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/picks/leaderboard`, { next: { revalidate: 300 } });
+    const res = await fetch(`${baseUrl}/api/picks/leaderboard`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const data = await res.json();
     return data.leaderboard ?? [];
@@ -39,7 +41,7 @@ export default async function LeaderboardPage() {
         <Trophy className="h-7 w-7 text-[#FF6200]" />
         <div>
           <h1 className="text-2xl font-bold">Pick'em Leaderboard</h1>
-          <p className="text-sm text-muted-foreground">Ranked by current hot streak · updated every 5 minutes</p>
+          <p className="text-sm text-muted-foreground">Ranked by correct picks · updated every minute</p>
         </div>
       </div>
 
@@ -61,48 +63,61 @@ export default async function LeaderboardPage() {
             <span className="text-center">Accuracy</span>
           </div>
 
-          {leaderboard.map((entry, i) => (
-            <div
-              key={entry.userId}
-              className={`grid grid-cols-[40px_1fr_80px_80px_80px] gap-0 items-center px-4 py-3 border-b border-border/50 last:border-0 ${
-                i === 0 ? "bg-[#FF6200]/5" : ""
-              }`}
-            >
-              <span className={`text-sm font-bold ${i === 0 ? "text-[#FF6200]" : i < 3 ? "text-muted-foreground" : "text-muted-foreground/50"}`}>
-                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-              </span>
-
-              <div>
-                <p className="font-semibold text-sm">{entry.username}</p>
-                {entry.bestStreak > 0 && (
-                  <p className="text-[10px] text-muted-foreground">Best streak: {entry.bestStreak}</p>
-                )}
-              </div>
-
-              <div className="text-center">
-                {entry.streak > 0 ? (
-                  <span className="inline-flex items-center gap-0.5 text-sm font-bold text-[#FF6200]">
-                    <Flame className="h-3.5 w-3.5" />
-                    {entry.streak}
-                  </span>
-                ) : (
-                  <span className="text-sm text-muted-foreground">—</span>
-                )}
-              </div>
-
-              <div className="text-center">
-                <span className="text-sm font-medium">
-                  {entry.correct}–{entry.total - entry.correct}
+          {leaderboard.map((entry, i) => {
+            const pending = entry.total - entry.resolved;
+            return (
+              <div
+                key={entry.userId}
+                className={`grid grid-cols-[40px_1fr_80px_80px_80px] gap-0 items-center px-4 py-3 border-b border-border/50 last:border-0 ${
+                  i === 0 ? "bg-[#FF6200]/5" : ""
+                }`}
+              >
+                <span className={`text-sm font-bold ${i === 0 ? "text-[#FF6200]" : i < 3 ? "text-muted-foreground" : "text-muted-foreground/50"}`}>
+                  {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                 </span>
-              </div>
 
-              <div className="text-center">
-                <span className={`text-sm font-bold ${entry.accuracy >= 60 ? "text-green-500" : entry.accuracy >= 50 ? "text-foreground" : "text-muted-foreground"}`}>
-                  {entry.accuracy}%
-                </span>
+                <div>
+                  <p className="font-semibold text-sm">{entry.username}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {entry.total} pick{entry.total !== 1 ? "s" : ""}
+                    {pending > 0 ? ` · ${pending} pending` : ""}
+                    {entry.bestStreak > 0 ? ` · Best: ${entry.bestStreak}🔥` : ""}
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  {entry.streak > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-sm font-bold text-[#FF6200]">
+                      <Flame className="h-3.5 w-3.5" />
+                      {entry.streak}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
+                  )}
+                </div>
+
+                <div className="text-center">
+                  {entry.resolved > 0 ? (
+                    <span className="text-sm font-medium">
+                      {entry.correct}–{entry.wrong}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
+                  )}
+                </div>
+
+                <div className="text-center">
+                  {entry.resolved > 0 ? (
+                    <span className={`text-sm font-bold ${entry.accuracy >= 60 ? "text-green-500" : entry.accuracy >= 50 ? "text-foreground" : "text-muted-foreground"}`}>
+                      {entry.accuracy}%
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">pending</span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -110,7 +125,7 @@ export default async function LeaderboardPage() {
         <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
         <div className="text-xs text-muted-foreground leading-relaxed">
           <strong className="text-foreground">How it works:</strong> Make a pick on any game page before kickoff.
-          Correct picks build your streak. Minimum 3 resolved picks to appear on the leaderboard.
+          Correct picks build your streak. Rankings update once games are resolved.
           Picks lock when the game starts.
         </div>
       </div>

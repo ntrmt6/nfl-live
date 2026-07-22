@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Flame, Lock, CheckCircle2, XCircle } from "lucide-react";
+import { Flame, Lock, CheckCircle2, XCircle, Users } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 interface Props {
@@ -21,6 +21,12 @@ interface PickData {
   streak: number;
 }
 
+interface PickCounts {
+  home: number;
+  away: number;
+  total: number;
+}
+
 function logoUrl(abbr: string) {
   return `https://a.espncdn.com/i/teamlogos/nfl/500/${abbr.toLowerCase()}.png`;
 }
@@ -28,9 +34,20 @@ function logoUrl(abbr: string) {
 export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTeamFull, gameStatus }: Props) {
   const { user } = useUser();
   const [data, setData] = useState<PickData>({ choice: null, streak: 0 });
+  const [counts, setCounts] = useState<PickCounts>({ home: 0, away: 0, total: 0 });
   const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
 
+  // Fetch public pick counts (no auth required)
+  useEffect(() => {
+    fetch(`/api/picks/counts?gameSlug=${gameSlug}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.total !== undefined) setCounts({ home: d.home, away: d.away, total: d.total });
+      })
+      .catch(() => {});
+  }, [gameSlug]);
+
+  // Fetch user's pick if logged in
   useEffect(() => {
     if (!user) return;
     fetch(`/api/picks?gameSlug=${gameSlug}`)
@@ -38,8 +55,8 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
       .then((d) => {
         const myPick = d.picks?.find((p: { gameSlug: string }) => p.gameSlug === gameSlug);
         setData({ choice: myPick?.choice ?? null, correct: myPick?.correct, streak: d.stats?.streak ?? 0 });
-        setFetched(true);
-      });
+      })
+      .catch(() => {});
   }, [user, gameSlug]);
 
   async function makePick(choice: "home" | "away") {
@@ -51,11 +68,25 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
       body: JSON.stringify({ gameSlug, choice }),
     });
     const d = await res.json();
-    if (d.pick) setData((prev) => ({ ...prev, choice: d.pick.choice }));
+    if (d.pick) {
+      const prev = data.choice;
+      setData((prev_) => ({ ...prev_, choice: d.pick.choice }));
+      // Update local counts optimistically
+      setCounts((c) => {
+        const next = { ...c };
+        if (prev && prev !== choice) next[prev] = Math.max(0, next[prev] - 1);
+        if (!prev) next.total = c.total + 1;
+        if (prev !== choice) next[choice] = c[choice] + 1;
+        return next;
+      });
+    }
     setLoading(false);
   }
 
   const locked = gameStatus !== "scheduled";
+
+  const homePct = counts.total > 0 ? Math.round((counts.home / counts.total) * 100) : 50;
+  const awayPct = counts.total > 0 ? 100 - homePct : 50;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
@@ -98,6 +129,8 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
             const resolved = data.correct !== undefined;
             const isCorrect = chosen && data.correct === true;
             const isWrong = chosen && data.correct === false;
+            const pct = side === "home" ? homePct : awayPct;
+            const sideCount = counts[side];
 
             return (
               <button
@@ -123,12 +156,42 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
                   <Image src={logoUrl(abbr)} alt={full} fill className="object-contain" unoptimized />
                 </div>
                 <span className="text-xs font-medium">{full.split(" ").slice(-1)[0]}</span>
+                {counts.total > 0 && (
+                  <span className="text-[10px] text-muted-foreground">{sideCount} pick{sideCount !== 1 ? "s" : ""} · {pct}%</span>
+                )}
                 {chosen && !resolved && (
                   <span className="text-[9px] text-[#FF6200] font-bold uppercase">Your Pick ✓</span>
                 )}
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Pick distribution bar */}
+      {counts.total > 0 && (
+        <div className="mt-3">
+          <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+            <span className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              {counts.total} total pick{counts.total !== 1 ? "s" : ""}
+            </span>
+            {!user && <span className="text-[10px]">Login to pick</span>}
+          </div>
+          <div className="relative h-1.5 rounded-full bg-secondary overflow-hidden flex">
+            <div
+              className="h-full bg-blue-500 transition-all"
+              style={{ width: `${awayPct}%` }}
+            />
+            <div
+              className="h-full bg-red-500 transition-all"
+              style={{ width: `${homePct}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
+            <span>{awayTeam} {awayPct}%</span>
+            <span>{homeTeam} {homePct}%</span>
+          </div>
         </div>
       )}
 
