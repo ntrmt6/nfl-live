@@ -196,6 +196,17 @@ function EspnTabContent({ league }: { league: League }) {
 
   useEffect(() => { load(); }, [load]);
 
+  // Auto-refresh every 30s when live games are present
+  useEffect(() => {
+    const hasLive = games.some(g => {
+      const n = g.status.type.name;
+      return n.includes("IN_PROGRESS") || n.includes("HALFTIME");
+    });
+    if (!hasLive) return;
+    const id = setInterval(load, 30_000);
+    return () => clearInterval(id);
+  }, [games, load]);
+
   const filtered = games.filter(g =>
     query.trim() === "" ||
     `${g.home.displayName} ${g.away.displayName}`.toLowerCase().includes(query.toLowerCase())

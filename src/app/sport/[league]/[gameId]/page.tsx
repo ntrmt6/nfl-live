@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Brain, CalendarDays, Tv, MapPin, TrendingUp, Trophy, Shield, Zap, Home, BarChart3 } from "lucide-react";
+import { ChevronLeft, Brain, CalendarDays, Tv, MapPin, TrendingUp, Trophy, Shield, Zap, Home, BarChart3, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { generateSportPrediction, SportConditionLayer } from "@/lib/sport-prediction-engine";
 import { getSportType } from "@/lib/sport-teams";
 import { SportShareButtons } from "@/components/sport/SportShareButtons";
 import { absoluteUrl } from "@/lib/utils";
+import { generateGameAnalysis, type LeaderStat } from "@/lib/game-analysis";
+import { LiveScorePoller } from "@/components/sport/LiveScorePoller";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 // ── League config (mirrors SportsScheduleTabs) ────────────────
 const LEAGUE_CONFIG: Record<string, { label: string; espnSlug: string; color: string }> = {
@@ -143,6 +145,10 @@ export default async function SportGamePage({
 
   const sportType = getSportType(league);
   const prediction = generateSportPrediction(league, game.homeAbbr, game.awayAbbr, false, gameId);
+
+  const analysisResult = game.isFinal
+    ? await generateGameAnalysis(config.espnSlug, gameId, league)
+    : null;
 
   const kickoff = new Date(game.date);
   const isSoccer = sportType === "soccer";
@@ -281,12 +287,18 @@ export default async function SportGamePage({
             </div>
           </div>
 
-          {/* Live score or game info */}
-          {(game.isLive || game.isFinal) ? (
+          {/* Live score / Final score / Game info */}
+          {game.isLive ? (
+            <LiveScorePoller
+              espnSlug={config.espnSlug}
+              gameId={gameId}
+              initialHome={{ name: game.homeFull, score: game.homeScore || "0", logo: game.homeLogo }}
+              initialAway={{ name: game.awayFull, score: game.awayScore || "0", logo: game.awayLogo }}
+              initialStatusText={game.statusText}
+            />
+          ) : game.isFinal ? (
             <div className="rounded-xl border border-border bg-card p-6">
-              <h2 className="font-semibold text-lg mb-4">
-                {game.isLive ? "Live Score" : "Final Score"}
-              </h2>
+              <h2 className="font-semibold text-lg mb-4">Final Score</h2>
               <div className="flex items-center justify-around py-4">
                 <div className="flex flex-col items-center gap-2">
                   {game.awayLogo && <img src={game.awayLogo} alt={game.awayFull} width={52} height={52} className="object-contain" />}
@@ -295,8 +307,7 @@ export default async function SportGamePage({
                   <span className="text-xs text-muted-foreground">AWAY</span>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-black text-muted-foreground/30">VS</p>
-                  {game.isLive && <p className="text-xs text-red-400 font-bold animate-pulse">{game.statusText}</p>}
+                  <p className="text-xs text-muted-foreground font-bold">FINAL</p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   {game.homeLogo && <img src={game.homeLogo} alt={game.homeFull} width={52} height={52} className="object-contain" />}
@@ -314,6 +325,36 @@ export default async function SportGamePage({
                 <InfoRow icon={<Tv className="h-4 w-4" />} label="Network" value={game.network || "TBD"} />
                 {game.venue && <InfoRow icon={<MapPin className="h-4 w-4" />} label="Venue" value={game.venue} />}
               </div>
+            </div>
+          )}
+
+          {/* Post-game analysis */}
+          {analysisResult && (
+            <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FF6200]/10 shrink-0">
+                  <FileText className="h-3.5 w-3.5 text-[#FF6200]" />
+                </span>
+                <h2 className="font-semibold">Game Recap</h2>
+                <span className="ml-auto text-[10px] text-muted-foreground">AI Analysis</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{analysisResult.analysis}</p>
+              {analysisResult.leaders.length > 0 && (
+                <div className="border-t border-border pt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Statistical Leaders</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {analysisResult.leaders.map((l: LeaderStat, i: number) => (
+                      <div key={i} className="flex items-center justify-between rounded-lg bg-secondary/40 px-3 py-2 text-sm">
+                        <span className="text-muted-foreground text-xs">{l.category}</span>
+                        <div className="text-right">
+                          <p className="font-semibold text-xs">{l.player}</p>
+                          <p className="text-[10px] text-[#FF6200] font-bold">{l.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
