@@ -9,6 +9,7 @@ import { WisdomOfCrowd } from "@/components/game/WisdomOfCrowd";
 import { PickWidget } from "@/components/game/PickWidget";
 import { BoldPrediction } from "@/components/game/BoldPrediction";
 import { SharePredictionButtons } from "@/components/game/SharePredictionButtons";
+import { GeminiAnalysis } from "@/components/game/GeminiAnalysis";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -141,6 +142,12 @@ export default async function GamePage({
               </p>
             </div>
           )}
+
+          <GeminiAnalysis
+            gameSlug={game.slug}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+          />
 
           <div className="rounded-xl border border-border bg-card p-6">
             <h2 className="font-semibold text-lg mb-4">Game Information</h2>

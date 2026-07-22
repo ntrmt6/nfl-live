@@ -1,0 +1,145 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Sparkles, ChevronDown, ChevronUp, Swords, Shield, Zap, TrendingUp, Eye } from "lucide-react";
+
+interface Analysis {
+  overview: string;
+  keyMatchups: string[];
+  offensiveBreakdown: string;
+  defensiveBreakdown: string;
+  xFactor: string;
+  predictionNarrative: string;
+}
+
+interface Props {
+  gameSlug: string;
+  homeTeamFull: string;
+  awayTeamFull: string;
+}
+
+export function GeminiAnalysis({ gameSlug, homeTeamFull, awayTeamFull }: Props) {
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!expanded || analysis || error) return;
+    setLoading(true);
+    fetch(`/api/games/gemini-analysis?slug=${gameSlug}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.analysis) setAnalysis(d.analysis);
+        else setError(true);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [expanded, gameSlug, analysis, error]);
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      {/* Header — always visible */}
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full flex items-center gap-3 p-5 hover:bg-secondary/30 transition-colors"
+      >
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 shrink-0">
+          <Sparkles className="h-4 w-4 text-white" />
+        </div>
+        <div className="text-left flex-1">
+          <p className="font-semibold text-sm">AI Deep Dive</p>
+          <p className="text-[11px] text-muted-foreground">
+            Gemini-powered analysis · {awayTeamFull} vs {homeTeamFull}
+          </p>
+        </div>
+        {expanded
+          ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+          : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+        }
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border">
+          {loading && (
+            <div className="p-6 space-y-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-3 rounded-full bg-secondary animate-pulse" style={{ width: `${85 - i * 10}%` }} />
+              ))}
+              <p className="text-[11px] text-muted-foreground text-center pt-2">Generating analysis with Gemini AI...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-6 text-center text-sm text-muted-foreground">
+              Analysis unavailable right now. Try again later.
+            </div>
+          )}
+
+          {analysis && (
+            <div className="p-5 space-y-5">
+              {/* Overview */}
+              <p className="text-sm leading-relaxed text-foreground/90">{analysis.overview}</p>
+
+              {/* Key Matchups */}
+              {analysis.keyMatchups?.length > 0 && (
+                <Section icon={<Swords className="h-3.5 w-3.5" />} title="Key Matchups">
+                  <ul className="space-y-2">
+                    {analysis.keyMatchups.map((m, i) => (
+                      <li key={i} className="flex gap-2 text-sm text-foreground/80">
+                        <span className="text-[#FF6200] font-bold shrink-0">{i + 1}.</span>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Offense */}
+                <Section icon={<TrendingUp className="h-3.5 w-3.5" />} title="Offensive Outlook">
+                  <p className="text-sm text-foreground/80 leading-relaxed">{analysis.offensiveBreakdown}</p>
+                </Section>
+
+                {/* Defense */}
+                <Section icon={<Shield className="h-3.5 w-3.5" />} title="Defensive Outlook">
+                  <p className="text-sm text-foreground/80 leading-relaxed">{analysis.defensiveBreakdown}</p>
+                </Section>
+              </div>
+
+              {/* X-Factor */}
+              {analysis.xFactor && (
+                <Section icon={<Zap className="h-3.5 w-3.5 text-yellow-500" />} title="X-Factor">
+                  <p className="text-sm text-foreground/80 leading-relaxed">{analysis.xFactor}</p>
+                </Section>
+              )}
+
+              {/* Prediction Narrative */}
+              {analysis.predictionNarrative && (
+                <Section icon={<Eye className="h-3.5 w-3.5 text-purple-400" />} title="AI Prediction Take">
+                  <p className="text-sm text-foreground/80 leading-relaxed italic">{analysis.predictionNarrative}</p>
+                </Section>
+              )}
+
+              <p className="text-[10px] text-muted-foreground/60 text-center pt-1">
+                Generated by Google Gemini · For entertainment purposes
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg bg-secondary/30 p-4">
+      <div className="flex items-center gap-1.5 mb-2.5">
+        <span className="text-muted-foreground">{icon}</span>
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h4>
+      </div>
+      {children}
+    </div>
+  );
+}
