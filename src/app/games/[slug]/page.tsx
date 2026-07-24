@@ -10,6 +10,7 @@ import { PickWidget } from "@/components/game/PickWidget";
 import { BoldPrediction } from "@/components/game/BoldPrediction";
 import { SharePredictionButtons } from "@/components/game/SharePredictionButtons";
 import { GeminiAnalysis } from "@/components/game/GeminiAnalysis";
+import { PlayerComparison } from "@/components/game/PlayerComparison";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -147,6 +148,19 @@ export default async function GamePage({
             gameSlug={game.slug}
             homeTeamFull={game.homeTeamFull}
             awayTeamFull={game.awayTeamFull}
+          />
+
+          <PlayerComparison
+            awayTeam={game.awayTeam}
+            homeTeam={game.homeTeam}
+            awayTeamFull={game.awayTeamFull}
+            homeTeamFull={game.homeTeamFull}
+            awayPPG={prediction?.awayTeamStats?.pts_for}
+            homePPG={prediction?.homeTeamStats?.pts_for}
+            awayDefPts={prediction?.awayTeamStats?.pts_against}
+            homeDefPts={prediction?.homeTeamStats?.pts_against}
+            awayWinRate={prediction?.awayTeamStats?.win_rate}
+            homeWinRate={prediction?.homeTeamStats?.win_rate}
           />
 
           <div className="rounded-xl border border-border bg-card p-6">
