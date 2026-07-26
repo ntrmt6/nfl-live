@@ -104,7 +104,7 @@ export function WisdomOfCrowd({ gameSlug, homeTeam, awayTeam, homeTeamFull, away
 
       {!data?.userChoice && (
         <p className="text-center text-[10px] text-muted-foreground mt-2">
-          Tap a team to cast your vote
+          Select a team to cast your vote
         </p>
       )}
     </div>

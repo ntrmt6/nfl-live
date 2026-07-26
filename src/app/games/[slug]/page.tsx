@@ -286,7 +286,7 @@ function TeamBlock({
         <div>
           <span className="font-medium text-sm">{name}</span>
           {isWinner && (
-            <p className="text-[10px] text-[#FF6200] font-semibold">Model Pick ✓</p>
+            <p className="text-[10px] text-[#FF6200] font-semibold uppercase tracking-wide">Model Pick</p>
           )}
         </div>
       </div>

@@ -95,7 +95,7 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
         <h3 className="font-semibold text-sm">Make Your Pick</h3>
         {user && data.streak > 0 && (
           <span className="ml-auto flex items-center gap-1 text-xs font-bold text-[#FF6200]">
-            🔥 {data.streak}-game streak
+            {data.streak}-game streak
           </span>
         )}
       </div>
@@ -160,7 +160,7 @@ export function PickWidget({ gameSlug, homeTeam, awayTeam, homeTeamFull, awayTea
                   <span className="text-[10px] text-muted-foreground">{sideCount} pick{sideCount !== 1 ? "s" : ""} · {pct}%</span>
                 )}
                 {chosen && !resolved && (
-                  <span className="text-[9px] text-[#FF6200] font-bold uppercase">Your Pick ✓</span>
+                  <span className="text-[9px] text-[#FF6200] font-bold uppercase tracking-wide">Your Pick</span>
                 )}
               </button>
             );

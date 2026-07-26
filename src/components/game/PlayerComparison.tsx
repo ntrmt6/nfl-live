@@ -133,11 +133,11 @@ export function PlayerComparison({
             </div>
 
             <div className="rounded-md bg-green-500/10 border border-green-500/20 px-3 py-2 text-xs text-green-400 leading-snug">
-              <span className="font-semibold">&#128170; Strength:</span> {profile.strength}
+              <span className="font-semibold">Strength:</span> {profile.strength}
             </div>
 
             <div className="rounded-md bg-[#FF6200]/10 border border-[#FF6200]/20 px-3 py-2 text-xs text-[#FF6200] leading-snug">
-              <span className="font-semibold">&#9888; Weakness:</span> {profile.weakness}
+              <span className="font-semibold">Weakness:</span> {profile.weakness}
             </div>
           </div>
         ))}
