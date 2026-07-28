@@ -19,6 +19,7 @@ export interface IGame {
   viewerCountBase: number;
   featured: boolean;
   description?: string;
+  kickoffReminderSent?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -46,6 +47,7 @@ const GameSchema = new Schema<IGame>(
     viewerCountBase: { type: Number, default: 12000 },
     featured: { type: Boolean, default: false },
     description: { type: String },
+    kickoffReminderSent: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

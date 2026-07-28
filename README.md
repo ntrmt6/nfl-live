@@ -67,6 +67,23 @@ blog posts with the built-in WYSIWYG editor.
    networks) on the same pages as AdSense; stacking ad networks like that
    is a frequent cause of invalid-traffic suspensions.
 
+### Web push alerts
+
+Signed-in users can opt into browser push notifications (Profile page, or the
+bell item in the account menu) for two things: a kickoff reminder for games
+they've picked, and a result notification once their pick resolves.
+
+1. Generate a VAPID key pair: `npx web-push generate-vapid-keys`
+2. Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and
+   `VAPID_CONTACT_EMAIL` in `.env.local`.
+3. Pick results are pushed automatically whenever picks are resolved
+   (`/admin/games` → "Resolve Picks", which calls `resolvePicksForGame`).
+4. Kickoff reminders are sent on demand from `/admin/games` → "Send Kickoff
+   Reminders", which pushes to anyone who picked a game kicking off in the
+   next 60 minutes. Wire that button's endpoint
+   (`POST /api/admin/push/kickoff-reminders`) up to an external scheduler if
+   you want it to run automatically instead of manually.
+
 ## Monetization design note
 
 The live game "player" (`src/components/player/LiveStreamPlayer.tsx`) is

@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/db";
 import Pick from "@/models/Pick";
 import Game from "@/models/Game";
+import { sendPushToUsers } from "@/lib/push";
 
 /**
  * Resolves all unresolved picks for a single final game.
@@ -34,6 +35,25 @@ export async function resolvePicksForGame(gameSlug: string): Promise<number> {
   }));
 
   await Pick.bulkWrite(ops);
+
+  const matchup = `${game.awayTeamFull} @ ${game.homeTeamFull}`;
+  sendPushToUsers(
+    unresolved.map((pick) => {
+      const correct = winner !== "tie" && pick.choice === winner;
+      return {
+        userId: pick.userId,
+        payload: {
+          title: correct ? "Your pick hit! ✅" : "Pick result is in",
+          body: correct
+            ? `You called it: ${matchup} — final ${game.awayScore}-${game.homeScore}.`
+            : `${matchup} finished ${game.awayScore}-${game.homeScore}. Better luck next pick.`,
+          url: `/games/${gameSlug}`,
+          tag: `pick-result-${gameSlug}`,
+        },
+      };
+    })
+  ).catch(() => {});
+
   return unresolved.length;
 }
 

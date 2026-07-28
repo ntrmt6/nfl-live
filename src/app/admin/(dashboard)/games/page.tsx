@@ -6,6 +6,7 @@ import { getTeam } from "@/lib/teams";
 import { formatGameTime } from "@/lib/utils";
 import { GameRowActions } from "@/components/admin/GameRowActions";
 import { ResolvePicksButton } from "@/components/admin/ResolvePicksButton";
+import { SendKickoffRemindersButton } from "@/components/admin/SendKickoffRemindersButton";
 
 async function getGames() {
   try {
@@ -26,6 +27,7 @@ export default async function AdminGamesPage() {
         <h1 className="text-2xl font-bold">Games</h1>
         <div className="flex items-center gap-2">
           <ResolvePicksButton />
+          <SendKickoffRemindersButton />
           <Link
             href="/admin/games/new"
             className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"

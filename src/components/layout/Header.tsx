@@ -10,6 +10,7 @@ import { useUser } from "@/context/UserContext";
 import { UserAvatar } from "@/components/comments/UserAvatar";
 import { AuthModal } from "@/components/comments/AuthModal";
 import { ScoreTicker } from "@/components/layout/ScoreTicker";
+import { PushOptIn } from "@/components/PushOptIn";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -18,6 +19,7 @@ const NAV_LINKS = [
   { href: "/predictions", label: "NFL Picks" },
   { href: "/college-football", label: "CFB Picks" },
   { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/leagues", label: "Leagues" },
   { href: "/blog", label: "Analysis" },
   { href: "/blog?tag=NFL+Picks", label: "Picks" },
   { href: "/blog?tag=Fantasy+Football+2026", label: "Fantasy" },
@@ -113,6 +115,7 @@ export function Header() {
                             <User className="h-4 w-4 text-muted-foreground" />
                             My Profile
                           </Link>
+                          <PushOptIn variant="compact" />
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors border-t border-border"
