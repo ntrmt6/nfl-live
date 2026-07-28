@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
-import { Trophy, Flame, Target } from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Pick'em Leaderboard | NFL Predictions Hub",
-  description: "See who's on the hottest pick'em streak. The NFL Predictions Hub community leaderboard — ranked by current streak and prediction accuracy.",
-};
-
-export const revalidate = 60;
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Trophy, Flame, Target, Users } from "lucide-react";
 
 interface LeaderboardEntry {
   userId: string;
@@ -20,24 +16,32 @@ interface LeaderboardEntry {
   bestStreak: number;
 }
 
-async function getLeaderboard(): Promise<LeaderboardEntry[]> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/picks/leaderboard`, { next: { revalidate: 60 } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.leaderboard ?? [];
-  } catch {
-    return [];
-  }
+interface LeaderboardResponse {
+  leaderboard: LeaderboardEntry[];
+  seasons: number[];
+  season: number | null;
 }
 
-export default async function LeaderboardPage() {
-  const leaderboard = await getLeaderboard();
+export default function LeaderboardPage() {
+  const [data, setData] = useState<LeaderboardResponse>({ leaderboard: [], seasons: [], season: null });
+  const [selectedSeason, setSelectedSeason] = useState<number | "all">("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const qs = selectedSeason === "all" ? "" : `?season=${selectedSeason}`;
+    fetch(`/api/picks/leaderboard${qs}`)
+      .then((r) => r.json())
+      .then((d) => setData(d))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [selectedSeason]);
+
+  const { leaderboard, seasons } = data;
 
   return (
     <div className="container py-10 max-w-3xl">
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-6">
         <Trophy className="h-7 w-7 text-[#FF6200]" />
         <div>
           <h1 className="text-2xl font-bold">Pick'em Leaderboard</h1>
@@ -45,7 +49,51 @@ export default async function LeaderboardPage() {
         </div>
       </div>
 
-      {leaderboard.length === 0 ? (
+      {seasons.length > 0 && (
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-none">
+          <button
+            onClick={() => setSelectedSeason("all")}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+              selectedSeason === "all"
+                ? "bg-[#FF6200] text-white"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All-Time
+          </button>
+          {seasons.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSelectedSeason(s)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                selectedSeason === s
+                  ? "bg-[#FF6200] text-white"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {s} Season
+            </button>
+          ))}
+        </div>
+      )}
+
+      <Link
+        href="/leagues"
+        className="mb-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-[#FF6200]/40 transition-colors"
+      >
+        <Users className="h-5 w-5 text-[#FF6200] shrink-0" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold">Compete with friends</p>
+          <p className="text-xs text-muted-foreground">Create or join a private league to see how your picks stack up against people you know.</p>
+        </div>
+        <span className="text-xs font-semibold text-[#FF6200]">View Leagues →</span>
+      </Link>
+
+      {loading ? (
+        <div className="rounded-xl border border-border bg-card p-12 text-center">
+          <div className="animate-pulse text-muted-foreground text-sm">Loading standings…</div>
+        </div>
+      ) : leaderboard.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-12 text-center">
           <Trophy className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
           <p className="font-semibold">No picks yet</p>
@@ -121,8 +169,20 @@ export default async function LeaderboardPage() {
         </div>
       )}
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-4 flex items-start gap-3">
-        <Target className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+      <Link
+        href="/predictions/accuracy"
+        className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-[#FF6200]/40 transition-colors"
+      >
+        <Target className="h-5 w-5 text-[#FF6200] shrink-0" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold">How accurate is the AI model?</p>
+          <p className="text-xs text-muted-foreground">See real hit-rate stats tracked against final scores, broken down by week and confidence.</p>
+        </div>
+        <span className="text-xs font-semibold text-[#FF6200]">View Scoreboard →</span>
+      </Link>
+
+      <div className="mt-4 rounded-xl border border-border bg-card p-4 flex items-start gap-3">
+        <Trophy className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
         <div className="text-xs text-muted-foreground leading-relaxed">
           <strong className="text-foreground">How it works:</strong> Make a pick on any game page before kickoff.
           Correct picks build your streak. Rankings update once games are resolved.

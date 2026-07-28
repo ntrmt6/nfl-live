@@ -10,6 +10,7 @@ import { RANKS } from "@/lib/badge-system";
 import { useToast } from "@/components/ui/toast";
 import { AuthModal } from "@/components/comments/AuthModal";
 import { MyPicksTab } from "@/components/profile/MyPicksTab";
+import { PushOptIn } from "@/components/PushOptIn";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
@@ -206,6 +207,10 @@ export default function ProfilePage() {
           </button>
         </div>
         <p className="text-xs text-muted-foreground">3–30 characters, letters/numbers/underscores only.</p>
+      </div>
+
+      <div className="mb-6">
+        <PushOptIn />
       </div>
 
       <button
