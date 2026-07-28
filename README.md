@@ -1,4 +1,4 @@
-# NFL Live Zone
+# nflpredicts.com
 
 Premium, dark-themed NFL schedule + blog site built with Next.js (App Router),
 Tailwind CSS, Framer Motion, and MongoDB/Mongoose.
