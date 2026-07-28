@@ -170,12 +170,12 @@ export default function LeaguesPage() {
                   href={`/leagues/${league.code}`}
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-[#FF6200]/40 transition-colors"
                 >
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm flex items-center gap-1.5">
-                      {league.name}
-                      {league.ownerId === user._id && <Crown className="h-3.5 w-3.5 text-[#FF6200]" />}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm flex items-center gap-1.5 min-w-0">
+                      <span className="truncate">{league.name}</span>
+                      {league.ownerId === user._id && <Crown className="h-3.5 w-3.5 text-[#FF6200] shrink-0" />}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground truncate">
                       {league.members.length} member{league.members.length !== 1 ? "s" : ""} · {league.season} season · code {league.code}
                     </p>
                   </div>

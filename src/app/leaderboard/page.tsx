@@ -124,9 +124,9 @@ export default function LeaderboardPage() {
                   {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                 </span>
 
-                <div>
-                  <p className="font-semibold text-sm">{entry.username}</p>
-                  <p className="text-[10px] text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate">{entry.username}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
                     {entry.total} pick{entry.total !== 1 ? "s" : ""}
                     {pending > 0 ? ` · ${pending} pending` : ""}
                     {entry.bestStreak > 0 ? ` · Best: ${entry.bestStreak}🔥` : ""}

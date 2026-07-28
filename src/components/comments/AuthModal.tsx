@@ -67,16 +67,16 @@ export function AuthModal({ open, onClose, defaultTab = "login" }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md glass rounded-2xl border border-border shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative my-auto w-full max-w-md">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground z-10"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground"
         >
           <X className="h-5 w-5" />
         </button>
-
+        <div className="max-h-[90vh] overflow-y-auto glass rounded-2xl border border-border shadow-2xl">
         {/* Tabs */}
         <div className="flex border-b border-border">
           {(["login", "register"] as const).map((t) => (
@@ -194,6 +194,7 @@ export function AuthModal({ open, onClose, defaultTab = "login" }: Props) {
               </p>
             </form>
           )}
+        </div>
         </div>
       </div>
     </div>

@@ -46,7 +46,7 @@ export function Header() {
     <>
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} defaultTab={authTab} />
 
-      <header className="sticky top-0 z-50 w-full glass shadow-header">
+      <header className="sticky top-0 z-[60] w-full glass shadow-header">
         {/* TIER 1 — Score Ticker */}
         <ScoreTicker />
 

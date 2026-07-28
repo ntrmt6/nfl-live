@@ -146,9 +146,9 @@ export default function LeagueDetailPage() {
                   <span className={`text-sm font-bold ${i === 0 ? "text-[#FF6200]" : "text-muted-foreground/50"}`}>
                     {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                   </span>
-                  <p className="font-semibold text-sm flex items-center gap-1.5">
-                    {entry.username}
-                    {entry.userId === league.ownerId && <Crown className="h-3 w-3 text-[#FF6200]" />}
+                  <p className="font-semibold text-sm flex items-center gap-1.5 min-w-0">
+                    <span className="truncate">{entry.username}</span>
+                    {entry.userId === league.ownerId && <Crown className="h-3 w-3 text-[#FF6200] shrink-0" />}
                   </p>
                   <div className="text-center">
                     {entry.streak > 0 ? (
@@ -174,9 +174,9 @@ export default function LeagueDetailPage() {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Members</p>
             <div className="flex flex-wrap gap-2">
               {league.members.map((m) => (
-                <span key={m.userId} className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-medium">
-                  {m.username}
-                  {m.userId === league.ownerId && <Crown className="h-3 w-3 text-[#FF6200]" />}
+                <span key={m.userId} className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-medium max-w-[calc(100vw-4rem)]">
+                  <span className="truncate">{m.username}</span>
+                  {m.userId === league.ownerId && <Crown className="h-3 w-3 text-[#FF6200] shrink-0" />}
                 </span>
               ))}
             </div>
