@@ -80,7 +80,7 @@ Generate ONLY the post text itself. No quotes, no labels, no explanations. Make 
       return NextResponse.json({ error: "Missing gameData or blogData" }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = promptContext;
 
