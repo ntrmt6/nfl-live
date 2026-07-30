@@ -97,6 +97,13 @@ export function BlogShareButtons({ title, excerpt, tags, url }: BlogShareButtons
   async function handlePlatform(id: string) {
     const platform = platforms.find((p) => p.id === id)!;
     setLoading(id);
+
+    // Open popup synchronously before any await — browsers block window.open() after async gaps
+    let popup: Window | null = null;
+    if (platform.type === "url") {
+      popup = window.open("about:blank", "_blank", "noopener,width=600,height=500");
+    }
+
     try {
       const shareText = await generateShareText(id, blogData);
       const u = encodeURIComponent(url);
@@ -106,7 +113,7 @@ export function BlogShareButtons({ title, excerpt, tags, url }: BlogShareButtons
       if (platform.type === "clipboard") {
         await navigator.clipboard.writeText(`${shareText}\n\n${url}`);
       } else {
-        const urls: Record<string, string> = {
+        const shareUrls: Record<string, string> = {
           x:         `https://twitter.com/intent/tweet?text=${t}&url=${u}&via=Nflpredictsml`,
           facebook:  `https://www.facebook.com/sharer/sharer.php?u=${u}`,
           whatsapp:  `https://wa.me/?text=${t}%20${u}`,
@@ -116,13 +123,13 @@ export function BlogShareButtons({ title, excerpt, tags, url }: BlogShareButtons
           linkedin:  `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
           reddit:    `https://www.reddit.com/submit?url=${u}&title=${ti}`,
         };
-        if (urls[id]) window.open(urls[id], "_blank", "noopener,noreferrer,width=600,height=500");
+        if (shareUrls[id] && popup) popup.location.href = shareUrls[id];
       }
 
       setDone(id);
       setTimeout(() => setDone(null), 3000);
     } catch {
-      // silently ignore
+      popup?.close();
     } finally {
       setLoading(null);
     }
