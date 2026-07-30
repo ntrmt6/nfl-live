@@ -11,6 +11,8 @@ import { BoldPrediction } from "@/components/game/BoldPrediction";
 import { SharePredictionButtons } from "@/components/game/SharePredictionButtons";
 import { GeminiAnalysis } from "@/components/game/GeminiAnalysis";
 import { PlayerComparison } from "@/components/game/PlayerComparison";
+import { LiveWinProbability } from "@/components/game/LiveWinProbability";
+import { GameProjections } from "@/components/game/GameProjections";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { getTeam } from "@/lib/teams";
@@ -132,6 +134,16 @@ export default async function GamePage({
             </h1>
           </div>
 
+          {prediction && (
+            <LiveWinProbability
+              homeTeam={game.homeTeam}
+              awayTeam={game.awayTeam}
+              homeTeamFull={game.homeTeamFull}
+              awayTeamFull={game.awayTeamFull}
+              preGameHomeProb={prediction.homeWinProbability ?? 50}
+            />
+          )}
+
           {prediction ? (
             <MatchupPredictionDetail pred={prediction} />
           ) : (
@@ -149,6 +161,17 @@ export default async function GamePage({
             homeTeamFull={game.homeTeamFull}
             awayTeamFull={game.awayTeamFull}
           />
+
+          {prediction?.homeTeamStats && prediction?.awayTeamStats && (
+            <GameProjections
+              homeTeam={game.homeTeam}
+              awayTeam={game.awayTeam}
+              homeTeamFull={game.homeTeamFull}
+              awayTeamFull={game.awayTeamFull}
+              homeStats={prediction.homeTeamStats}
+              awayStats={prediction.awayTeamStats}
+            />
+          )}
 
           <PlayerComparison
             awayTeam={game.awayTeam}

@@ -87,14 +87,22 @@ export default function AccuracyScoreboardPage() {
         Back to leaderboard
       </Link>
 
-      <div className="flex items-center gap-3 mb-6">
-        <Target className="h-7 w-7 text-[#FF6200]" />
-        <div>
-          <h1 className="text-2xl font-bold">AI Model Accuracy Scoreboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Graded against final scores — not a self-reported number.
-          </p>
+      <div className="flex items-start justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <Target className="h-7 w-7 text-[#FF6200]" />
+          <div>
+            <h1 className="text-2xl font-bold">AI Model Accuracy Scoreboard</h1>
+            <p className="text-sm text-muted-foreground">
+              Graded against final scores — not a self-reported number.
+            </p>
+          </div>
         </div>
+        <Link
+          href="/model"
+          className="shrink-0 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-[#FF6200]/50 transition-colors"
+        >
+          How it works →
+        </Link>
       </div>
 
       <div className="flex items-center gap-2 mb-6">

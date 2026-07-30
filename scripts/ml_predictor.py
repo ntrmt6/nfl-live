@@ -13,7 +13,7 @@ import requests
 import numpy as np
 import pandas as pd
 from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 from pymongo import MongoClient
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -160,9 +160,23 @@ def train(feat_df: pd.DataFrame):
         gamma=0.1, random_state=42, eval_metric='logloss', verbosity=0,
     )
     clf.fit(X_tr, y_tr, eval_set=[(X_te, y_te)], verbose=False)
-    acc = accuracy_score(y_te, clf.predict(X_te))
+    y_pred = clf.predict(X_te)
+    acc = accuracy_score(y_te, y_pred)
+    train_acc = accuracy_score(y_tr, clf.predict(X_tr))
     print(f"  Validation accuracy: {acc:.1%}  (n={len(X_te)})", flush=True)
-    return clf, acc
+
+    cm = confusion_matrix(y_te, y_pred)
+    conf_matrix = {
+        'tn': int(cm[0][0]), 'fp': int(cm[0][1]),
+        'fn': int(cm[1][0]), 'tp': int(cm[1][1]),
+    }
+    importances = clf.feature_importances_
+    feature_importances = sorted(
+        [{'feature': FEAT_COLS[i], 'importance': round(float(v), 4)}
+         for i, v in enumerate(importances)],
+        key=lambda x: x['importance'], reverse=True,
+    )
+    return clf, acc, train_acc, conf_matrix, feature_importances
 
 def predict_matchup(clf, home: str, away: str, week: int, history: dict) -> dict:
     hs  = _stats(history[home][-WINDOW:])
@@ -205,7 +219,7 @@ def main():
     feat_df = feat_df[feat_df['h_n'] >= 1].reset_index(drop=True)
 
     print(f'==> Training XGBoost on {len(feat_df)} samples...', flush=True)
-    clf, acc = train(feat_df)
+    clf, acc, train_acc, conf_matrix, feature_importances = train(feat_df)
 
     print('==> Connecting to MongoDB...', flush=True)
     client = MongoClient(mongo_uri, serverSelectionTimeoutMS=8000)
@@ -256,8 +270,12 @@ def main():
         {'$set': {
             '_type': 'model_meta',
             'accuracy': round(acc * 100, 1),
+            'trainAccuracy': round(train_acc * 100, 1),
             'trainingSamples': int(len(feat_df)),
             'seasons': [2021, 2022, 2023, 2024],
+            'featureImportances': feature_importances,
+            'confusionMatrix': conf_matrix,
+            'features': FEAT_COLS,
             'updatedAt': datetime.utcnow(),
         }},
         upsert=True,
