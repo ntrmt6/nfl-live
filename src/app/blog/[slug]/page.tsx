@@ -6,6 +6,7 @@ import { CalendarDays, User, ChevronLeft } from "lucide-react";
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from "@/lib/data/posts";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { BlogCard } from "@/components/blog/BlogCard";
+import { BlogShareButtons } from "@/components/blog/BlogShareButtons";
 import { blogPostingSchema, breadcrumbSchema } from "@/lib/schema-org";
 import { absoluteUrl } from "@/lib/utils";
 import { extractTeamsFromText } from "@/lib/teams";
@@ -161,6 +162,15 @@ export default async function BlogPostPage({
       </div>
 
       <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+      <div className="mt-10 pt-8 border-t border-border">
+        <BlogShareButtons
+          title={post.title}
+          excerpt={post.excerpt || ""}
+          tags={post.tags}
+          url={absoluteUrl(`/blog/${post.slug}`)}
+        />
+      </div>
 
       {relatedPosts.length > 0 && (
         <div className="mt-12 pt-8 border-t border-border">
