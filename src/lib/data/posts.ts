@@ -66,6 +66,16 @@ export async function getAllPostsForSitemap(): Promise<{ slug: string; updatedAt
   }
 }
 
+export async function getPostsForAutoLink(): Promise<{ slug: string; title: string }[]> {
+  try {
+    await connectDB();
+    const posts = await Post.find({ published: true }, "slug title").lean();
+    return posts.map((p: any) => ({ slug: p.slug, title: p.title }));
+  } catch {
+    return [];
+  }
+}
+
 export async function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): Promise<PostDTO[]> {
   try {
     await connectDB();

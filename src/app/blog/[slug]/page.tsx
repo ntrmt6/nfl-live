@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, User, ChevronLeft } from "lucide-react";
-import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from "@/lib/data/posts";
+import { getPostBySlug, getAllPostSlugs, getRelatedPosts, getPostsForAutoLink } from "@/lib/data/posts";
+import { autoLinkContent } from "@/lib/auto-link";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { BlogShareButtons } from "@/components/blog/BlogShareButtons";
@@ -64,7 +65,11 @@ export default async function BlogPostPage({
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const relatedPosts = await getRelatedPosts(slug, post.tags, 3);
+  const [relatedPosts, allPosts] = await Promise.all([
+    getRelatedPosts(slug, post.tags, 3),
+    getPostsForAutoLink(),
+  ]);
+  const linkedContent = autoLinkContent(post.content, allPosts, slug);
   const jsonLd = blogPostingSchema(post as any);
   const breadcrumb = breadcrumbSchema([
     { name: "Home", url: "/" },
@@ -161,7 +166,7 @@ export default async function BlogPostPage({
         )}
       </div>
 
-      <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <div className="prose-nfl" dangerouslySetInnerHTML={{ __html: linkedContent }} />
 
       <div className="mt-10 pt-8 border-t border-border">
         <BlogShareButtons
