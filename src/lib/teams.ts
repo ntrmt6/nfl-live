@@ -55,6 +55,14 @@ export function getTeam(abbr: string): TeamInfo {
 
 export const TEAM_LIST = Object.values(TEAMS);
 
+export function teamToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+export function getTeamBySlug(slug: string): TeamInfo | null {
+  return TEAM_LIST.find((t) => teamToSlug(t.name) === slug) ?? null;
+}
+
 export function extractTeamsFromText(...texts: string[]): string[] {
   const combined = texts.join(" ").toLowerCase();
   const found: string[] = [];

@@ -20,6 +20,7 @@ const NAV_LINKS = [
   { href: "/college-football", label: "CFB Picks" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/leagues", label: "Leagues" },
+  { href: "/teams", label: "Teams" },
   { href: "/blog", label: "Analysis" },
   { href: "/blog?tag=NFL+Picks", label: "Picks" },
   { href: "/blog?tag=Fantasy+Football+2026", label: "Fantasy" },

@@ -61,6 +61,20 @@ export async function getAllGameSlugs(): Promise<string[]> {
   }
 }
 
+export async function getTeamGames(abbr: string, limit = 40): Promise<GameDTO[]> {
+  try {
+    await connectDB();
+    const games = await Game.find({ $or: [{ homeTeam: abbr }, { awayTeam: abbr }] })
+      .sort({ kickoff: 1 })
+      .limit(limit)
+      .lean();
+    return games.map(serialize);
+  } catch (err) {
+    console.warn("[getTeamGames] DB unavailable:", (err as Error).message);
+    return [];
+  }
+}
+
 export async function getAllGamesForSitemap(): Promise<{ slug: string; updatedAt: Date; kickoff: Date }[]> {
   try {
     await connectDB();

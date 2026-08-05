@@ -94,6 +94,26 @@ export async function getAdjacentPosts(
   }
 }
 
+export async function getTeamPosts(teamName: string, limit = 30): Promise<PostDTO[]> {
+  try {
+    await connectDB();
+    const posts = await Post.find({
+      published: true,
+      $or: [
+        { tags: { $regex: teamName, $options: "i" } },
+        { title: { $regex: teamName, $options: "i" } },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    return posts.map(serialize);
+  } catch (err) {
+    console.warn("[getTeamPosts] DB unavailable:", (err as Error).message);
+    return [];
+  }
+}
+
 export async function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): Promise<PostDTO[]> {
   try {
     await connectDB();
