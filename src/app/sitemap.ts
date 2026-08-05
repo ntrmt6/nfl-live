@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllGamesForSitemap } from "@/lib/data/games";
 import { getAllPostsForSitemap } from "@/lib/data/posts";
 import { getAllCollegeGameSlugs } from "@/lib/data/college-games";
+import { TEAM_LIST, teamToSlug } from "@/lib/teams";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const BUILT_AT = new Date();
@@ -45,12 +46,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/predictions`,        lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.95 },
     { url: `${SITE_URL}/college-football`,   lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.93 },
     { url: `${SITE_URL}/blog`,               lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.85 },
+    { url: `${SITE_URL}/teams`,              lastModified: BUILT_AT,              changeFrequency: "weekly",  priority: 0.82 },
     { url: `${SITE_URL}/leaderboard`,        lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.7 },
     { url: `${SITE_URL}/contact`,            lastModified: new Date("2026-07-01"), changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`,            lastModified: new Date("2026-07-01"), changeFrequency: "yearly",  priority: 0.2 },
     { url: `${SITE_URL}/terms`,              lastModified: new Date("2026-07-01"), changeFrequency: "yearly",  priority: 0.2 },
     { url: `${SITE_URL}/disclaimer`,         lastModified: new Date("2026-07-01"), changeFrequency: "yearly",  priority: 0.2 },
   ];
+
+  // Team hub pages — overview, games, blog for all 32 teams
+  const teamRoutes: MetadataRoute.Sitemap = TEAM_LIST.flatMap((team) => {
+    const slug = teamToSlug(team.name);
+    const base = `${SITE_URL}/teams/${slug}`;
+    return [
+      { url: base,               lastModified: BUILT_AT, changeFrequency: "daily"  as const, priority: 0.80 },
+      { url: `${base}/games`,    lastModified: BUILT_AT, changeFrequency: "daily"  as const, priority: 0.75 },
+      { url: `${base}/blog`,     lastModified: BUILT_AT, changeFrequency: "weekly" as const, priority: 0.70 },
+    ];
+  });
 
   const now = Date.now();
 
@@ -93,5 +106,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  return [...staticRoutes, ...gameRoutes, ...postRoutes, ...collegeRoutes, ...sportRoutes];
+  return [...staticRoutes, ...teamRoutes, ...gameRoutes, ...postRoutes, ...collegeRoutes, ...sportRoutes];
 }

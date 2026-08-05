@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, TrendingUp, User, LogOut, ChevronDown, Brain } from "lucide-react";
+import { Menu, X, TrendingUp, User, LogOut, ChevronDown, Brain, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { UserAvatar } from "@/components/comments/UserAvatar";
 import { AuthModal } from "@/components/comments/AuthModal";
 import { ScoreTicker } from "@/components/layout/ScoreTicker";
 import { PushOptIn } from "@/components/PushOptIn";
+import { teamToSlug } from "@/lib/teams";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -20,11 +21,21 @@ const NAV_LINKS = [
   { href: "/college-football", label: "CFB Picks" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/leagues", label: "Leagues" },
-  { href: "/teams", label: "Teams" },
   { href: "/blog", label: "Analysis" },
   { href: "/blog?tag=NFL+Picks", label: "Picks" },
   { href: "/blog?tag=Fantasy+Football+2026", label: "Fantasy" },
   { href: "/contact", label: "More" },
+];
+
+const NFL_DIVISIONS = [
+  { name: "AFC East",  teams: [{ abbr: "BUF", name: "Buffalo Bills" }, { abbr: "MIA", name: "Miami Dolphins" }, { abbr: "NE", name: "New England Patriots" }, { abbr: "NYJ", name: "New York Jets" }] },
+  { name: "AFC North", teams: [{ abbr: "BAL", name: "Baltimore Ravens" }, { abbr: "CIN", name: "Cincinnati Bengals" }, { abbr: "CLE", name: "Cleveland Browns" }, { abbr: "PIT", name: "Pittsburgh Steelers" }] },
+  { name: "AFC South", teams: [{ abbr: "HOU", name: "Houston Texans" }, { abbr: "IND", name: "Indianapolis Colts" }, { abbr: "JAX", name: "Jacksonville Jaguars" }, { abbr: "TEN", name: "Tennessee Titans" }] },
+  { name: "AFC West",  teams: [{ abbr: "DEN", name: "Denver Broncos" }, { abbr: "KC", name: "Kansas City Chiefs" }, { abbr: "LV", name: "Las Vegas Raiders" }, { abbr: "LAC", name: "Los Angeles Chargers" }] },
+  { name: "NFC East",  teams: [{ abbr: "DAL", name: "Dallas Cowboys" }, { abbr: "NYG", name: "New York Giants" }, { abbr: "PHI", name: "Philadelphia Eagles" }, { abbr: "WAS", name: "Washington Commanders" }] },
+  { name: "NFC North", teams: [{ abbr: "CHI", name: "Chicago Bears" }, { abbr: "DET", name: "Detroit Lions" }, { abbr: "GB", name: "Green Bay Packers" }, { abbr: "MIN", name: "Minnesota Vikings" }] },
+  { name: "NFC South", teams: [{ abbr: "ATL", name: "Atlanta Falcons" }, { abbr: "CAR", name: "Carolina Panthers" }, { abbr: "NO", name: "New Orleans Saints" }, { abbr: "TB", name: "Tampa Bay Buccaneers" }] },
+  { name: "NFC West",  teams: [{ abbr: "ARI", name: "Arizona Cardinals" }, { abbr: "LAR", name: "Los Angeles Rams" }, { abbr: "SF", name: "San Francisco 49ers" }, { abbr: "SEA", name: "Seattle Seahawks" }] },
 ];
 
 export function Header() {
@@ -32,6 +43,9 @@ export function Header() {
   const [showAuth, setShowAuth] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
+  const [mobileTeamsOpen, setMobileTeamsOpen] = useState(false);
+  const teamsRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useUser();
@@ -175,6 +189,75 @@ export function Header() {
                   </Link>
                 );
               })}
+
+              {/* NFL Teams dropdown */}
+              <div
+                ref={teamsRef}
+                className="relative h-full flex items-center"
+                onMouseEnter={() => setTeamsOpen(true)}
+                onMouseLeave={() => setTeamsOpen(false)}
+              >
+                <button
+                  className={cn(
+                    "flex items-center gap-1 h-full px-4 text-xs font-semibold uppercase tracking-wide whitespace-nowrap transition-colors border-b-2",
+                    pathname.startsWith("/teams")
+                      ? "border-[#FF6200] text-white"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  NFL Teams <ChevronDown className={`h-3 w-3 transition-transform ${teamsOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {teamsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-1/2 -translate-x-1/2 z-50 mt-0 w-[680px] glass border border-border rounded-xl shadow-2xl overflow-hidden"
+                    >
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/50">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                            <Shield className="h-3 w-3" /> All 32 Teams
+                          </span>
+                          <Link href="/teams" className="text-[10px] font-bold text-[#FF6200] hover:underline">
+                            View all hubs →
+                          </Link>
+                        </div>
+                        <div className="grid grid-cols-4 gap-3">
+                          {NFL_DIVISIONS.map((div) => (
+                            <div key={div.name}>
+                              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50 mb-1.5">{div.name}</p>
+                              <div className="space-y-0.5">
+                                {div.teams.map((team) => (
+                                  <Link
+                                    key={team.abbr}
+                                    href={`/teams/${teamToSlug(team.name)}`}
+                                    onClick={() => setTeamsOpen(false)}
+                                    className="flex items-center gap-1.5 px-1.5 py-1 rounded-md hover:bg-secondary transition-colors group"
+                                  >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                      src={`https://a.espncdn.com/i/teamlogos/nfl/500/${team.abbr.toLowerCase()}.png`}
+                                      alt={team.name}
+                                      className="h-4 w-4 object-contain shrink-0"
+                                    />
+                                    <span className="text-[11px] font-medium text-foreground/80 group-hover:text-foreground transition-colors leading-tight truncate">
+                                      {team.name.split(" ").slice(-1)[0]}
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </nav>
           </div>
         </div>
@@ -205,6 +288,39 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
+
+                {/* NFL Teams expandable in mobile */}
+                <button
+                  onClick={() => setMobileTeamsOpen((v) => !v)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary transition-colors text-foreground/80 w-full text-left"
+                >
+                  <span className="flex items-center gap-2"><Shield className="h-4 w-4" /> NFL Teams</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${mobileTeamsOpen ? "rotate-180" : ""}`} />
+                </button>
+                {mobileTeamsOpen && (
+                  <div className="pl-3 space-y-3 pt-1 pb-2">
+                    <Link href="/teams" onClick={() => setOpen(false)} className="block text-xs font-bold text-[#FF6200] px-2 py-1">View all 32 team hubs →</Link>
+                    {NFL_DIVISIONS.map((div) => (
+                      <div key={div.name}>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50 px-2 mb-1">{div.name}</p>
+                        <div className="grid grid-cols-2 gap-0.5">
+                          {div.teams.map((team) => (
+                            <Link
+                              key={team.abbr}
+                              href={`/teams/${teamToSlug(team.name)}`}
+                              onClick={() => { setOpen(false); setMobileTeamsOpen(false); }}
+                              className="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-secondary transition-colors text-xs text-foreground/80"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={`https://a.espncdn.com/i/teamlogos/nfl/500/${team.abbr.toLowerCase()}.png`} alt="" className="h-4 w-4 object-contain shrink-0" />
+                              {team.name.split(" ").slice(-1)[0]}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <Link
                   href="/predictions"
