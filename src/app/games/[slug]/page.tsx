@@ -15,7 +15,7 @@ import { LiveWinProbability } from "@/components/game/LiveWinProbability";
 import { GameProjections } from "@/components/game/GameProjections";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
-import { getTeam } from "@/lib/teams";
+import { getTeam, teamToSlug } from "@/lib/teams";
 import { formatGameTime, isLiveNow, absoluteUrl } from "@/lib/utils";
 import { sportsEventSchema, matchupPredictionSchema, breadcrumbSchema } from "@/lib/schema-org";
 
@@ -210,6 +210,29 @@ export default async function GamePage({
               <TeamBlock abbr={away.abbr} name={away.name} score={game.awayScore} isWinner={prediction?.predictedWinner === game.awayTeam} />
               <div className="text-center text-xs text-muted-foreground">at</div>
               <TeamBlock abbr={home.abbr} name={home.name} score={game.homeScore} isWinner={prediction?.predictedWinner === game.homeTeam} />
+            </div>
+          </div>
+
+          {/* Team Hub links */}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="font-semibold text-sm mb-3">Team Hubs</h3>
+            <div className="space-y-1">
+              {([{ team: away, game: game.awayTeam }, { team: home, game: game.homeTeam }] as const).map(({ team }) => (
+                <Link
+                  key={team.abbr}
+                  href={`/teams/${teamToSlug(team.name)}`}
+                  className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-secondary transition-colors group"
+                >
+                  <TeamLogo abbr={team.abbr} size={28} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold group-hover:text-[#FF6200] transition-colors truncate">
+                      {team.name}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">Games · Blog · Analysis</p>
+                  </div>
+                  <ChevronLeft className="h-4 w-4 text-muted-foreground/40 group-hover:text-[#FF6200] rotate-180 transition-colors shrink-0" />
+                </Link>
+              ))}
             </div>
           </div>
 
