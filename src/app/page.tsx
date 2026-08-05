@@ -32,17 +32,22 @@ export default async function HomePage() {
           {/* CENTER COLUMN — Featured + Schedule + Blog */}
           <main className="flex-1 min-w-0 space-y-5">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-[#FF6200] to-[#FF8C00]" />
-                <h1 className="text-base font-black tracking-tight text-foreground">
-                  Live Scores, Predictions & Schedule — <span className="text-gradient">All Sports 2026</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="inline-block h-5 w-1 shrink-0 rounded-full bg-gradient-to-b from-[#FF6200] to-[#FF8C00]" />
+                <h1 className="text-sm sm:text-base font-black tracking-tight text-foreground leading-tight">
+                  Live Scores & Predictions — <span className="text-gradient">All Sports 2026</span>
                 </h1>
               </div>
-              <div className="flex-1 h-px bg-gradient-to-r from-border/80 to-transparent" />
+              <div className="flex-1 h-px bg-gradient-to-r from-border/80 to-transparent hidden sm:block" />
             </div>
             <LiveScoresWrapper featuredGame={featuredGame} games={games} cfbGames={cfbGames} />
             <FanTalkFeed />
             {posts.length > 0 && <BlogTeaser posts={posts.slice(0, 3)} />}
+            {/* Mobile-only: Standings + Leaders below main content */}
+            <div className="lg:hidden space-y-5">
+              <StandingsWidget />
+              <LeagueLeaders />
+            </div>
           </main>
 
           {/* RIGHT COLUMN — Standings + Leaders */}

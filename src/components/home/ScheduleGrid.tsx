@@ -39,7 +39,7 @@ export function ScheduleGrid({ games, liveScores }: ScheduleGridProps) {
   return (
     <section id="schedule" className="scroll-mt-20">
       {/* Compact header */}
-      <div className="flex items-center justify-between gap-4 mb-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4 mb-3">
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 text-[#FF6200]" />
           <span className="text-xs font-black uppercase tracking-widest text-[#FF6200]">
@@ -49,7 +49,7 @@ export function ScheduleGrid({ games, liveScores }: ScheduleGridProps) {
             {filtered.length} game{filtered.length !== 1 ? "s" : ""}
           </span>
         </div>
-        <div className="relative w-44">
+        <div className="relative w-full sm:w-44">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="Search teams..."

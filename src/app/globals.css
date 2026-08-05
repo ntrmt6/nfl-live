@@ -4,32 +4,32 @@
 
 @layer base {
   :root {
-    --background: 222 28% 14%;
-    --foreground: 210 18% 95%;
+    --background: 0 0% 100%;
+    --foreground: 220 20% 10%;
 
-    --card: 222 25% 18%;
-    --card-foreground: 210 18% 95%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 20% 10%;
 
-    --popover: 222 25% 18%;
-    --popover-foreground: 210 18% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
 
     --primary: 23 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 22% 22%;
-    --secondary-foreground: 210 18% 90%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 220 20% 20%;
 
-    --muted: 222 20% 26%;
-    --muted-foreground: 218 12% 58%;
+    --muted: 210 18% 93%;
+    --muted-foreground: 218 14% 46%;
 
-    --accent: 204 100% 50%;
+    --accent: 204 90% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 356 82% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 18% 24%;
-    --input: 220 18% 22%;
+    --border: 220 16% 88%;
+    --input: 220 16% 93%;
     --ring: 23 100% 50%;
 
     --radius: 0.5rem;
@@ -44,8 +44,8 @@
     font-feature-settings: "cv02","cv03","cv04","cv11";
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,168,255,0.07) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 30% at 80% 90%, rgba(255,98,0,0.05) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 40% at 50% -5%, rgba(0,168,255,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 30% at 90% 95%, rgba(255,98,0,0.03) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }
@@ -59,10 +59,10 @@
   .text-crystal-blue { color: #00A8FF; }
 
   .glass {
-    background: hsl(222 22% 11% / 0.92);
+    background: hsl(0 0% 100% / 0.93);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid hsl(220 18% 18%);
+    border-bottom: 1px solid hsl(220 16% 90%);
   }
 
   /* Section labels — ESPN-style ALL CAPS */
@@ -94,8 +94,8 @@
   .data-grid tbody tr {
     @apply border-b border-border/30 transition-colors;
   }
-  .data-grid tbody tr:nth-child(even) { background: hsl(222 22% 9%); }
-  .data-grid tbody tr:hover { background: hsl(222 22% 14%); }
+  .data-grid tbody tr:nth-child(even) { background: hsl(210 20% 97%); }
+  .data-grid tbody tr:hover { background: hsl(23 100% 50% / 0.04); }
   .data-grid tbody td { @apply py-1.5 px-2 tabular-nums; }
   .data-grid .playoff-team { color: #00A8FF; font-weight: 600; }
   .data-grid .live-row { background: rgba(255, 98, 0, 0.08) !important; }
@@ -117,10 +117,10 @@
   /* Card hover */
   .card-hover {
     @apply transition-all duration-200 hover:border-primary/40 hover:-translate-y-1;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 8px rgba(0,0,0,0.04);
   }
   .card-hover:hover {
-    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,98,0,0.2), 0 0 20px -10px rgba(255,98,0,0.3);
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,98,0,0.18), 0 0 20px -10px rgba(255,98,0,0.18);
   }
 
   /* Section divider with glow */

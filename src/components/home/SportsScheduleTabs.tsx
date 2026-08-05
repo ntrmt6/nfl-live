@@ -239,10 +239,10 @@ function EspnTabContent({ league }: { league: League }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{filtered.length} game{filtered.length !== 1 ? "s" : ""}</span>
         <div className="flex-1" />
-        <div className="relative w-44">
+        <div className="relative w-full sm:w-44 sm:flex-none">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <input
             placeholder="Search teams…"
@@ -251,7 +251,7 @@ function EspnTabContent({ league }: { league: League }) {
             className="w-full pl-8 h-7 text-xs rounded-md border border-border bg-secondary/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[#FF6200]/40"
           />
         </div>
-        <button onClick={load} className="h-7 w-7 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={load} className="h-7 w-7 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground transition-colors shrink-0">
           <RefreshCw className="h-3.5 w-3.5" />
         </button>
       </div>

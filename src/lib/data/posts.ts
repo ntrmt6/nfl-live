@@ -76,6 +76,24 @@ export async function getPostsForAutoLink(): Promise<{ slug: string; title: stri
   }
 }
 
+export async function getAdjacentPosts(
+  currentSlug: string
+): Promise<{ prev: PostDTO | null; next: PostDTO | null }> {
+  try {
+    await connectDB();
+    const posts = await Post.find({ published: true }, "slug title tags createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+    const idx = posts.findIndex((p: any) => p.slug === currentSlug);
+    return {
+      prev: idx < posts.length - 1 ? serialize(posts[idx + 1]) : null,
+      next: idx > 0 ? serialize(posts[idx - 1]) : null,
+    };
+  } catch {
+    return { prev: null, next: null };
+  }
+}
+
 export async function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): Promise<PostDTO[]> {
   try {
     await connectDB();
