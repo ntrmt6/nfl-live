@@ -13,13 +13,23 @@ import { GeminiAnalysis } from "@/components/game/GeminiAnalysis";
 import { PlayerComparison } from "@/components/game/PlayerComparison";
 import { LiveWinProbability } from "@/components/game/LiveWinProbability";
 import { GameProjections } from "@/components/game/GameProjections";
+import { WeatherPanel } from "@/components/game/WeatherPanel";
+import { InjuryReport } from "@/components/game/InjuryReport";
+import { HeadToHeadHistory } from "@/components/game/HeadToHeadHistory";
+import { AnalyticsBreakdown } from "@/components/game/AnalyticsBreakdown";
 import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
+import { fetchStadiumWeather } from "@/lib/data/weather";
+import { fetchTeamInjuries } from "@/lib/data/injuries";
+import { getHeadToHeadStats } from "@/lib/data/head-to-head";
+import { computeGameAnalytics } from "@/lib/data/game-analytics";
 import { getTeam, teamToSlug } from "@/lib/teams";
 import { formatGameTime, isLiveNow, absoluteUrl } from "@/lib/utils";
 import { sportsEventSchema, matchupPredictionSchema, breadcrumbSchema } from "@/lib/schema-org";
 
 export const revalidate = 60;
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export async function generateStaticParams() {
   const slugs = await getAllGameSlugs();
@@ -37,14 +47,20 @@ export async function generateMetadata({
 
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
+  const year = new Date(game.kickoff).getFullYear();
 
-  const kickoffDate = new Date(game.kickoff).toLocaleDateString("en-US", {
-    weekday: "long", month: "long", day: "numeric", year: "numeric",
-  });
+  const prediction = await getPredictionForGame(
+    game.homeTeam, game.awayTeam, game.week, game.season
+  );
 
-  const title = `${away.name} vs ${home.name} Week ${game.week} – Prediction & Matchup Analysis`;
-  const description =
-    `AI-powered prediction for ${away.name} at ${home.name}. Win probabilities, key factors, team stats breakdown, and model confidence. Kickoff ${kickoffDate}.`;
+  const title = `${away.name} vs ${home.name} ${year} Week ${game.week} Score Prediction & Analytics – NFLPredicts`;
+
+  let description = `AI-powered prediction for ${away.name} at ${home.name}. Win probabilities, analytics, team stats, and model confidence.`;
+  if (prediction) {
+    const winner = prediction.predictedWinner === game.homeTeam ? home.name : away.name;
+    const conf = (prediction.confidence ?? 0).toFixed(0);
+    description = `Our model picks ${winner} to win with ${conf}% confidence. Full analytics, injury report, weather, and head-to-head breakdown for ${away.name} vs ${home.name} Week ${game.week}.`;
+  }
 
   return {
     title,
@@ -84,9 +100,15 @@ export default async function GamePage({
   const game = await getGameBySlug(slug);
   if (!game) notFound();
 
-  const prediction = await getPredictionForGame(
-    game.homeTeam, game.awayTeam, game.week, game.season
-  );
+  const [prediction, weather, homeInjuries, awayInjuries, h2h] = await Promise.all([
+    getPredictionForGame(game.homeTeam, game.awayTeam, game.week, game.season),
+    fetchStadiumWeather(game.homeTeam),
+    fetchTeamInjuries(game.homeTeam),
+    fetchTeamInjuries(game.awayTeam),
+    getHeadToHeadStats(game.homeTeam, game.awayTeam),
+  ]);
+
+  const analytics = prediction ? computeGameAnalytics(prediction, game) : null;
 
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
@@ -106,13 +128,22 @@ export default async function GamePage({
       {predSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(predSchema) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
 
-      <Link
-        href="/predictions"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Back to predictions
-      </Link>
+      <div className="flex items-center gap-4 mb-6">
+        <Link
+          href="/predictions"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to predictions
+        </Link>
+        <Link
+          href="/schedule"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Full 2026 Schedule
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
@@ -172,6 +203,31 @@ export default async function GamePage({
               awayStats={prediction.awayTeamStats}
             />
           )}
+
+          {analytics && (
+            <AnalyticsBreakdown
+              analytics={analytics}
+              homeTeamFull={game.homeTeamFull}
+              awayTeamFull={game.awayTeamFull}
+            />
+          )}
+
+          <HeadToHeadHistory
+            stats={h2h}
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+          />
+
+          <InjuryReport
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            homeTeamFull={game.homeTeamFull}
+            awayTeamFull={game.awayTeamFull}
+            homeInjuries={homeInjuries}
+            awayInjuries={awayInjuries}
+          />
 
           <PlayerComparison
             awayTeam={game.awayTeam}
@@ -236,6 +292,8 @@ export default async function GamePage({
             </div>
           </div>
 
+          <WeatherPanel weather={weather} />
+
           <WisdomOfCrowd
             gameSlug={game.slug}
             homeTeam={game.homeTeam}
@@ -275,6 +333,14 @@ export default async function GamePage({
               )}
             </div>
           )}
+
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="font-semibold text-sm mb-1">Embed This Prediction</h3>
+            <p className="text-xs text-muted-foreground mb-2">Free widget for your site</p>
+            <code className="text-xs bg-secondary p-2 rounded block break-all leading-relaxed">
+              {`<iframe src="${SITE_URL}/widget/${game.slug}" width="300" height="200" frameborder="0"></iframe>`}
+            </code>
+          </div>
 
           {prediction && (
             <SharePredictionButtons

@@ -44,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`,                  lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 1.0 },
     { url: `${SITE_URL}/predictions`,        lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.95 },
+    { url: `${SITE_URL}/schedule`,           lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.90 },
     { url: `${SITE_URL}/college-football`,   lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.93 },
     { url: `${SITE_URL}/blog`,               lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.85 },
     { url: `${SITE_URL}/teams`,              lastModified: BUILT_AT,              changeFrequency: "weekly",  priority: 0.82 },
@@ -106,5 +107,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  return [...staticRoutes, ...teamRoutes, ...gameRoutes, ...postRoutes, ...collegeRoutes, ...sportRoutes];
+  const widgetRoutes: MetadataRoute.Sitemap = games.map(({ slug }) => ({
+    url: `${SITE_URL}/widget/${slug}`,
+    lastModified: BUILT_AT,
+    changeFrequency: "weekly" as const,
+    priority: 0.3,
+  }));
+
+  return [...staticRoutes, ...teamRoutes, ...gameRoutes, ...postRoutes, ...collegeRoutes, ...sportRoutes, ...widgetRoutes];
 }
