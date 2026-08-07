@@ -45,6 +45,7 @@ DATASETS: dict[str, dict] = {
     "schedules":        {"fn": "import_schedules",        "seasons": SEASONS + [PROJECTION_SEASON], "per_season": True},
     "injuries":         {"fn": "import_injuries",         "seasons": SEASONS,                       "per_season": True},
     "draft_picks":      {"fn": "import_draft_picks",      "seasons": None,                          "per_season": False},
+    "player_ids":       {"fn": None,                      "seasons": None,                          "per_season": False},
 }
 
 
@@ -74,11 +75,28 @@ def _is_fresh(path: Path, season: int | None) -> bool:
 # host but allow raw file access. Both mirrors are maintained by nflverse.
 RAW_TREE_URLS = {
     "schedules": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
-    "draft_picks": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/draft_picks.csv",
+    "player_ids": "https://raw.githubusercontent.com/dynastyprocess/data/master/files/db_playerids.csv",
+}
+
+
+# nflverse restructured player stats in 2025: the legacy player_stats_<year>
+# assets stopped at 2024, replaced by stats_player_week_<year> with a few
+# renamed columns. Fetch the new asset and map it back to the legacy names the
+# rest of the pipeline uses.
+NEW_WEEKLY_FROM = 2025
+NEW_WEEKLY_URL = "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_{season}.parquet"
+NEW_WEEKLY_RENAMES = {
+    "team": "recent_team",
+    "passing_interceptions": "interceptions",
+    "sacks_suffered": "sacks",
 }
 
 
 def _fetch(name: str, fn_name: str, seasons: list[int] | None) -> pd.DataFrame:
+    if name == "weekly" and seasons and seasons[0] >= NEW_WEEKLY_FROM:
+        df = pd.read_parquet(NEW_WEEKLY_URL.format(season=seasons[0]))
+        return df.rename(columns=NEW_WEEKLY_RENAMES)
+
     if name in RAW_TREE_URLS:
         df = pd.read_csv(RAW_TREE_URLS[name], low_memory=False)
         if seasons is not None and "season" in df.columns:

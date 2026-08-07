@@ -1,0 +1,83 @@
+{
+  "season": 2023,
+  "positions": {
+    "QB": {
+      "n": 50,
+      "model_mae": 85.07557177372767,
+      "model_rmse": 99.59362655021812,
+      "model_spearman": 0.4500840336134454,
+      "baseline_mae": 108.31359942987561,
+      "baseline_rmse": 132.20077733618564,
+      "baseline_spearman": 0.3027703465204803,
+      "beats_baseline_mae": true
+    },
+    "RB": {
+      "n": 85,
+      "model_mae": 59.68842493294866,
+      "model_rmse": 74.63728679865972,
+      "model_spearman": 0.5415868673050614,
+      "baseline_mae": 79.64917647891185,
+      "baseline_rmse": 103.19673608865246,
+      "baseline_spearman": 0.3158010849398803,
+      "beats_baseline_mae": true
+    },
+    "WR": {
+      "n": 122,
+      "model_mae": 58.242448443698166,
+      "model_rmse": 75.32755578741094,
+      "model_spearman": 0.5576673016843698,
+      "baseline_mae": 64.60377019680426,
+      "baseline_rmse": 85.14878623043786,
+      "baseline_spearman": 0.4486279206943455,
+      "beats_baseline_mae": true
+    },
+    "TE": {
+      "n": 54,
+      "model_mae": 47.53438177263698,
+      "model_rmse": 61.27694984042619,
+      "model_spearman": 0.3527035011790022,
+      "baseline_mae": 48.445925999570775,
+      "baseline_rmse": 64.65997973994568,
+      "baseline_spearman": 0.37479271965973376,
+      "beats_baseline_mae": true
+    }
+  },
+  "calibration": [
+    {
+      "tier": "0-50",
+      "n": 39,
+      "mean_projected": 34.76642913471416,
+      "mean_actual": 100.66102553674808
+    },
+    {
+      "tier": "50-100",
+      "n": 116,
+      "mean_projected": 75.02099359733663,
+      "mean_actual": 82.44327566605703
+    },
+    {
+      "tier": "100-150",
+      "n": 86,
+      "mean_projected": 118.8819502928149,
+      "mean_actual": 146.3462790709942
+    },
+    {
+      "tier": "150-200",
+      "n": 52,
+      "mean_projected": 168.09811256833535,
+      "mean_actual": 212.12423062539443
+    },
+    {
+      "tier": "200-250",
+      "n": 14,
+      "mean_projected": 221.01626143604062,
+      "mean_actual": 208.817143201828
+    },
+    {
+      "tier": "250-+",
+      "n": 4,
+      "mean_projected": 292.6136379163092,
+      "mean_actual": 273.2300045490265
+    }
+  ]
+}
