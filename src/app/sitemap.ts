@@ -43,7 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`,                  lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 1.0 },
-    { url: `${SITE_URL}/predictions`,        lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.95 },
+    { url: `${SITE_URL}/predictions`,             lastModified: BUILT_AT, changeFrequency: "daily",  priority: 0.95 },
+    { url: `${SITE_URL}/predictions/mvp`,          lastModified: BUILT_AT, changeFrequency: "daily",  priority: 0.90 },
+    { url: `${SITE_URL}/predictions/super-bowl`,   lastModified: BUILT_AT, changeFrequency: "daily",  priority: 0.90 },
+    { url: `${SITE_URL}/predictions/awards`,       lastModified: BUILT_AT, changeFrequency: "daily",  priority: 0.88 },
+    { url: `${SITE_URL}/predictions/power-rankings`, lastModified: BUILT_AT, changeFrequency: "weekly", priority: 0.88 },
+    { url: `${SITE_URL}/predictions/division-winners`, lastModified: BUILT_AT, changeFrequency: "weekly", priority: 0.88 },
     { url: `${SITE_URL}/schedule`,           lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.90 },
     { url: `${SITE_URL}/college-football`,   lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.93 },
     { url: `${SITE_URL}/blog`,               lastModified: BUILT_AT,              changeFrequency: "daily",   priority: 0.85 },

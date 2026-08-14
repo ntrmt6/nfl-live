@@ -5,6 +5,8 @@ import { getPredictionForGame } from "@/lib/data/predictions"
 import { getTeam } from "@/lib/teams"
 import { connectDB } from "@/lib/db"
 import Post from "@/models/Post"
+import { pingIndexNow } from "@/lib/indexnow"
+import { absoluteUrl } from "@/lib/utils"
 
 export const maxDuration = 60
 
@@ -88,6 +90,13 @@ export async function POST(req: NextRequest) {
     metaTitle: title,
     metaDescription: `${game.awayTeamFull} ${game.awayScore} vs ${game.homeTeamFull} ${game.homeScore} — Week ${game.week} ${game.season} NFL game recap with prediction accuracy analysis.`,
   })
+
+  pingIndexNow([
+    absoluteUrl(`/blog/${uniqueSlug}`),
+    absoluteUrl(`/blog`),
+    absoluteUrl(`/games/${game.slug}`),
+  ]).catch(() => {})
+  void post;
 
   return NextResponse.json({ success: true, slug: uniqueSlug })
 }

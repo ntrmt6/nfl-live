@@ -14,11 +14,13 @@ import { PlayerComparison } from "@/components/game/PlayerComparison";
 import { LiveWinProbability } from "@/components/game/LiveWinProbability";
 import { GameProjections } from "@/components/game/GameProjections";
 import { GameResult } from "@/components/game/GameResult";
+import { GameFAQ, buildGameFAQs } from "@/components/game/GameFAQ";
+import { RelatedGames } from "@/components/game/RelatedGames";
 import { WeatherPanel } from "@/components/game/WeatherPanel";
 import { InjuryReport } from "@/components/game/InjuryReport";
 import { HeadToHeadHistory } from "@/components/game/HeadToHeadHistory";
 import { AnalyticsBreakdown } from "@/components/game/AnalyticsBreakdown";
-import { getGameBySlug, getAllGameSlugs } from "@/lib/data/games";
+import { getGameBySlug, getAllGameSlugs, getRelatedGames } from "@/lib/data/games";
 import { getPredictionForGame } from "@/lib/data/predictions";
 import { fetchStadiumWeather } from "@/lib/data/weather";
 import { fetchTeamInjuries } from "@/lib/data/injuries";
@@ -26,7 +28,7 @@ import { getHeadToHeadStats } from "@/lib/data/head-to-head";
 import { computeGameAnalytics } from "@/lib/data/game-analytics";
 import { getTeam, teamToSlug } from "@/lib/teams";
 import { formatGameTime, isLiveNow, absoluteUrl } from "@/lib/utils";
-import { sportsEventSchema, matchupPredictionSchema, breadcrumbSchema } from "@/lib/schema-org";
+import { sportsEventSchema, matchupPredictionSchema, breadcrumbSchema, faqPageSchema } from "@/lib/schema-org";
 
 export const revalidate = 60;
 
@@ -54,13 +56,23 @@ export async function generateMetadata({
     game.homeTeam, game.awayTeam, game.week, game.season
   );
 
-  const title = `${away.name} vs ${home.name} ${year} Week ${game.week} Score Prediction & Analytics – NFLPredicts`;
+  const isFinalMeta = game.status === "final";
+  let title: string;
+  let description: string;
 
-  let description = `AI-powered prediction for ${away.name} at ${home.name}. Win probabilities, analytics, team stats, and model confidence.`;
-  if (prediction) {
+  if (isFinalMeta && game.homeScore != null && game.awayScore != null) {
+    const winner = game.homeScore > game.awayScore ? home.name : away.name;
+    const finalScore = `${game.awayScore}-${game.homeScore}`;
+    title = `${away.name} ${game.awayScore}, ${home.name} ${game.homeScore} – Week ${game.week} ${year} Final Score & Recap`;
+    description = `${winner} beat ${winner === home.name ? away.name : home.name} ${finalScore} in Week ${game.week} of the ${year} NFL season. Full recap, prediction accuracy, and next-week outlook.`;
+  } else if (prediction) {
     const winner = prediction.predictedWinner === game.homeTeam ? home.name : away.name;
     const conf = (prediction.confidence ?? 0).toFixed(0);
-    description = `Our model picks ${winner} to win with ${conf}% confidence. Full analytics, injury report, weather, and head-to-head breakdown for ${away.name} vs ${home.name} Week ${game.week}.`;
+    title = `${away.name} vs ${home.name} Prediction, Pick & Odds – Week ${game.week} ${year} NFL`;
+    description = `AI model picks ${winner} to win with ${conf}% confidence in ${away.name} vs ${home.name} Week ${game.week}. Live win probability, injury report, weather, H2H, and best-bet breakdown.`;
+  } else {
+    title = `${away.name} vs ${home.name} Prediction & Preview – Week ${game.week} ${year} NFL`;
+    description = `AI-powered prediction preview for ${away.name} at ${home.name} Week ${game.week}. Win probability, matchup breakdown, team stats, and injury report.`;
   }
 
   return {
@@ -101,12 +113,19 @@ export default async function GamePage({
   const game = await getGameBySlug(slug);
   if (!game) notFound();
 
-  const [prediction, weather, homeInjuries, awayInjuries, h2h] = await Promise.all([
+  const [prediction, weather, homeInjuries, awayInjuries, h2h, relatedGames] = await Promise.all([
     getPredictionForGame(game.homeTeam, game.awayTeam, game.week, game.season),
     fetchStadiumWeather(game.homeTeam),
     fetchTeamInjuries(game.homeTeam),
     fetchTeamInjuries(game.awayTeam),
     getHeadToHeadStats(game.homeTeam, game.awayTeam),
+    getRelatedGames({
+      season: game.season,
+      week: game.week,
+      homeTeam: game.homeTeam,
+      awayTeam: game.awayTeam,
+      excludeSlug: game.slug,
+    }),
   ]);
 
   const analytics = prediction ? computeGameAnalytics(prediction, game) : null;
@@ -123,12 +142,15 @@ export default async function GamePage({
   ]);
   const eventSchema = sportsEventSchema({ ...game, kickoff: new Date(game.kickoff) } as any);
   const predSchema = prediction ? matchupPredictionSchema({ ...game, kickoff: new Date(game.kickoff) } as any, prediction) : null;
+  const faqItems = buildGameFAQs(game, prediction);
+  const faqSchema = faqPageSchema(faqItems.map((f) => ({ question: f.question, answer: f.answer })));
 
   return (
     <div className="container py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }} />
       {predSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(predSchema) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <div className="flex items-center gap-4 mb-6">
         <Link
@@ -245,6 +267,16 @@ export default async function GamePage({
             awayWinRate={prediction?.awayTeamStats?.win_rate}
             homeWinRate={prediction?.homeTeamStats?.win_rate}
           />
+
+          <RelatedGames
+            currentSlug={game.slug}
+            homeTeam={game.homeTeam}
+            awayTeam={game.awayTeam}
+            week={game.week}
+            games={relatedGames}
+          />
+
+          <GameFAQ game={game} prediction={prediction} faqs={faqItems} />
 
           <div className="rounded-xl border border-border bg-card p-6">
             <h2 className="font-semibold text-lg mb-4">Game Information</h2>

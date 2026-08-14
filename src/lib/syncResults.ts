@@ -1,6 +1,8 @@
 import { connectDB } from "@/lib/db";
 import Game from "@/models/Game";
 import { resolvePicksForGame } from "@/lib/resolvePicks";
+import { pingIndexNow } from "@/lib/indexnow";
+import { absoluteUrl } from "@/lib/utils";
 
 const ESPN_TO_OUR_ABBR: Record<string, string> = {
   LA: "LAR",
@@ -161,6 +163,15 @@ export async function syncResults(opts: {
       summary.finalized.push(g.slug);
       resolvePicksForGame(g.slug).catch(() => {});
     }
+  }
+
+  if (summary.finalized.length > 0) {
+    pingIndexNow([
+      ...summary.finalized.map((slug) => absoluteUrl(`/games/${slug}`)),
+      absoluteUrl(`/predictions`),
+      absoluteUrl(`/schedule`),
+      absoluteUrl(`/`),
+    ]).catch(() => {});
   }
 
   return summary;

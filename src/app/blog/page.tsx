@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { getPublishedPosts } from "@/lib/data/posts";
 import { absoluteUrl } from "@/lib/utils";
+import { collectionPageSchema, breadcrumbSchema, itemListSchema } from "@/lib/schema-org";
 
 export const revalidate = 60;
 
@@ -15,8 +16,29 @@ export const metadata: Metadata = {
 export default async function BlogIndexPage() {
   const posts = await getPublishedPosts(60);
 
+  const collSchema = collectionPageSchema({
+    name: "NFL Blog & Analysis",
+    description: "In-depth NFL game previews, AI-model breakdowns, recaps, and betting angles updated all season long.",
+    url: "/blog",
+    numberOfItems: posts.length,
+  });
+  const bcSchema = breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Blog", url: "/blog" },
+  ]);
+  const listSchema = itemListSchema(
+    posts.slice(0, 20).map((p) => ({
+      name: p.title,
+      url: `/blog/${p.slug}`,
+      description: p.excerpt,
+    }))
+  );
+
   return (
     <div className="container py-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bcSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listSchema) }} />
       <div className="max-w-2xl mb-10">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
           NFL <span className="text-gradient">Blog</span>

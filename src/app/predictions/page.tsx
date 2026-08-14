@@ -7,6 +7,7 @@ import { PredictionsRefreshButton } from "@/components/predictions/PredictionsRe
 import { OverviewCharts } from "@/components/predictions/OverviewCharts";
 import { PredictionCard } from "@/components/predictions/PredictionCard";
 import { Brain, Trophy, ChevronRight } from "lucide-react";
+import { itemListSchema, collectionPageSchema, breadcrumbSchema, faqPageSchema } from "@/lib/schema-org";
 
 export const dynamic = "force-dynamic";
 
@@ -49,8 +50,52 @@ export default async function PredictionsPage() {
     .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
     .slice(0, 5);
 
+  const listSchema = itemListSchema(
+    topPicks.map((p) => ({
+      name: `${p.awayTeamFull} at ${p.homeTeamFull} — ${p.predictedWinner} ${p.confidence?.toFixed(0)}% pick`,
+      url: `/games/${p.slug}`,
+      description: `AI model picks ${p.predictedWinner} to win with ${p.confidence?.toFixed(0)}% confidence.`,
+    }))
+  );
+  const collSchema = collectionPageSchema({
+    name: "NFL Game Predictions — AI Model Picks",
+    description: "AI-powered NFL game predictions with win probabilities, confidence scores, and full matchup breakdowns for every scheduled game.",
+    url: "/predictions",
+    numberOfItems: predictions.length,
+  });
+  const bcSchema = breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Predictions", url: "/predictions" },
+  ]);
+  const predFaqSchema = faqPageSchema([
+    {
+      question: "How does the NFL Predictions Hub AI model work?",
+      answer: "We train an XGBoost classifier on 4+ seasons of NFL data. Features include rolling 6-game team efficiency (win rate, points scored/allowed, differential), home/road splits, and situational stats — all computed from prior games only so there is no data leakage.",
+    },
+    {
+      question: "What does 'confidence' mean on a pick?",
+      answer: "Confidence is the model's estimated probability that its predicted winner will actually win, expressed as a percentage. A 75% confidence pick means the model expects that team to win 75 out of 100 times in comparable matchups.",
+    },
+    {
+      question: "How accurate are the picks?",
+      answer: (meta?.accuracy != null ? `Our current rolling accuracy is ${meta.accuracy}%. ` : "") + "You can find the transparent, time-series-validated accuracy on our model transparency page, updated as new games close.",
+    },
+    {
+      question: "Do you offer against-the-spread (ATS) or Over/Under picks?",
+      answer: "Our core model predicts straight-up win probability. We publish edge-case posts (best bets, upset alerts) that translate the model output into spread-aware picks using implied moneyline math.",
+    },
+    {
+      question: "How often are predictions refreshed?",
+      answer: "Predictions refresh weekly when new team stats and injury reports become available, and can be manually re-run via the admin panel to incorporate late-week line moves.",
+    },
+  ]);
+
   return (
     <div className="min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bcSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(predFaqSchema) }} />
       {/* Hero banner */}
       <div className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-[#0e1118] to-[#161b27]">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyNTJkM2QiIGZpbGwtb3BhY2l0eT0iMC4zIj48cGF0aCBkPSJNMzYgMzRoLTJ2Mmgydi0yem0tNCAwaDJ2LTJoLTJ2MnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />

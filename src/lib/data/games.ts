@@ -67,6 +67,34 @@ export async function getGameBySlug(slug: string): Promise<GameDTO | null> {
   }
 }
 
+export async function getRelatedGames(opts: {
+  season: number;
+  week: number;
+  homeTeam: string;
+  awayTeam: string;
+  excludeSlug: string;
+  limit?: number;
+}): Promise<GameDTO[]> {
+  try {
+    await connectDB();
+    const games = await Game.find({
+      season: opts.season,
+      $or: [
+        { week: opts.week },
+        { homeTeam: { $in: [opts.homeTeam, opts.awayTeam] } },
+        { awayTeam: { $in: [opts.homeTeam, opts.awayTeam] } },
+      ],
+      slug: { $ne: opts.excludeSlug },
+    })
+      .sort({ kickoff: 1 })
+      .limit(opts.limit ?? 20)
+      .lean();
+    return games.map(serialize);
+  } catch {
+    return [];
+  }
+}
+
 export async function getAllGameSlugs(): Promise<string[]> {
   try {
     await connectDB();

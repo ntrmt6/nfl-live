@@ -5,6 +5,8 @@ import { connectDB } from "@/lib/db";
 import Post from "@/models/Post";
 import { postSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { pingIndexNow } from "@/lib/indexnow";
+import { absoluteUrl } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin();
@@ -48,6 +50,11 @@ export async function POST(req: NextRequest) {
     revalidatePath("/");
     if (parsed.published) {
       revalidatePath(`/blog/${slug}`);
+      pingIndexNow([
+        absoluteUrl(`/blog/${slug}`),
+        absoluteUrl(`/blog`),
+        absoluteUrl(`/`),
+      ]).catch(() => {});
     }
 
     return NextResponse.json({ post }, { status: 201 });

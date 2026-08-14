@@ -204,6 +204,64 @@ export function faqPageSchema(faqs: { question: string; answer: string }[]) {
   };
 }
 
+export function itemListSchema(items: {
+  name: string;
+  url: string;
+  description?: string;
+}[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      url: absoluteUrl(item.url),
+      ...(item.description ? { description: item.description } : {}),
+    })),
+  };
+}
+
+export function collectionPageSchema({
+  name,
+  description,
+  url,
+  numberOfItems,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  numberOfItems?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    description,
+    url: absoluteUrl(url),
+    ...(numberOfItems ? { numberOfItems } : {}),
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+  };
+}
+
+export function sportsTeamSchema(team: { name: string; abbr: string; slug: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SportsTeam",
+    name: team.name,
+    sport: "American Football",
+    memberOf: {
+      "@type": "SportsOrganization",
+      name: "National Football League",
+      url: "https://www.nfl.com",
+    },
+    url: absoluteUrl(`/teams/${team.slug}`),
+    alternateName: team.abbr,
+  };
+}
+
 export function breadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",

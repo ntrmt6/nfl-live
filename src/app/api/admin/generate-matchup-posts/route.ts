@@ -3,6 +3,8 @@ import slugify from "slugify";
 import { connectDB } from "@/lib/db";
 import Game from "@/models/Game";
 import Post from "@/models/Post";
+import { pingIndexNow } from "@/lib/indexnow";
+import { absoluteUrl } from "@/lib/utils";
 
 export const maxDuration = 300;
 
@@ -496,6 +498,7 @@ export async function POST(req: NextRequest) {
   }
 
   let created = 0, skipped = 0;
+  const publishedSlugs: string[] = [];
 
   for (const game of games) {
     const doc = generateContent(game);
@@ -508,7 +511,15 @@ export async function POST(req: NextRequest) {
     } else {
       await Post.create(doc);
     }
+    publishedSlugs.push(doc.slug);
     created++;
+  }
+
+  if (publishedSlugs.length > 0) {
+    pingIndexNow([
+      ...publishedSlugs.map((s) => absoluteUrl(`/blog/${s}`)),
+      absoluteUrl(`/blog`),
+    ]).catch(() => {});
   }
 
   return NextResponse.json({
