@@ -1,6 +1,21 @@
 import { connectDB } from "@/lib/db";
 import Game from "@/models/Game";
 import { GameDTO } from "@/types";
+import { syncResults } from "@/lib/syncResults";
+
+const STALE_AFTER_MS = 4 * 60 * 60 * 1000; // 4h after kickoff
+const lazySyncCooldown = new Map<string, number>();
+const COOLDOWN_MS = 10 * 60 * 1000;
+
+function maybeLazySync(game: { slug: string; season: number; week: number; kickoff: Date | string; status: string }) {
+  if (game.status === "final") return;
+  const kickoffMs = new Date(game.kickoff).getTime();
+  if (Date.now() - kickoffMs < STALE_AFTER_MS) return;
+  const last = lazySyncCooldown.get(game.slug) ?? 0;
+  if (Date.now() - last < COOLDOWN_MS) return;
+  lazySyncCooldown.set(game.slug, Date.now());
+  syncResults({ season: game.season, week: game.week }).catch(() => {});
+}
 
 function serialize(doc: any): GameDTO {
   return {
@@ -44,6 +59,7 @@ export async function getGameBySlug(slug: string): Promise<GameDTO | null> {
     await connectDB();
     const game = await Game.findOne({ slug }).lean();
     if (!game) return null;
+    maybeLazySync(game);
     return serialize(game);
   } catch (err) {
     console.warn("[getGameBySlug] DB unavailable:", (err as Error).message);

@@ -13,6 +13,7 @@ import { GeminiAnalysis } from "@/components/game/GeminiAnalysis";
 import { PlayerComparison } from "@/components/game/PlayerComparison";
 import { LiveWinProbability } from "@/components/game/LiveWinProbability";
 import { GameProjections } from "@/components/game/GameProjections";
+import { GameResult } from "@/components/game/GameResult";
 import { WeatherPanel } from "@/components/game/WeatherPanel";
 import { InjuryReport } from "@/components/game/InjuryReport";
 import { HeadToHeadHistory } from "@/components/game/HeadToHeadHistory";
@@ -113,6 +114,7 @@ export default async function GamePage({
   const home = getTeam(game.homeTeam);
   const away = getTeam(game.awayTeam);
   const live = game.status === "live" || isLiveNow(game.kickoff);
+  const isFinal = game.status === "final";
 
   const breadcrumb = breadcrumbSchema([
     { name: "Home", url: "/" },
@@ -149,15 +151,15 @@ export default async function GamePage({
         <div className="lg:col-span-2 space-y-6">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Badge variant={live ? "live" : "neon"}>
-                {live ? "LIVE NOW" : `WEEK ${game.week}`}
+              <Badge variant={isFinal ? "neon" : live ? "live" : "neon"}>
+                {isFinal ? "FINAL" : live ? "LIVE NOW" : `WEEK ${game.week}`}
               </Badge>
               {game.network && (
                 <span className="text-sm text-muted-foreground">{game.network}</span>
               )}
               <span className="ml-auto flex items-center gap-1 text-xs text-[#FF6200] font-semibold">
                 <TrendingUp className="h-3.5 w-3.5" />
-                AI Prediction
+                {isFinal ? "AI Prediction Result" : "AI Prediction"}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
@@ -165,7 +167,9 @@ export default async function GamePage({
             </h1>
           </div>
 
-          {prediction && (
+          {isFinal && <GameResult game={game} prediction={prediction} />}
+
+          {!isFinal && prediction && (
             <LiveWinProbability
               homeTeam={game.homeTeam}
               awayTeam={game.awayTeam}
@@ -292,7 +296,7 @@ export default async function GamePage({
             </div>
           </div>
 
-          <WeatherPanel weather={weather} />
+          {!isFinal && <WeatherPanel weather={weather} />}
 
           <WisdomOfCrowd
             gameSlug={game.slug}
@@ -302,24 +306,28 @@ export default async function GamePage({
             awayTeamFull={game.awayTeamFull}
           />
 
-          <PickWidget
-            gameSlug={game.slug}
-            homeTeam={game.homeTeam}
-            awayTeam={game.awayTeam}
-            homeTeamFull={game.homeTeamFull}
-            awayTeamFull={game.awayTeamFull}
-            gameStatus={game.status}
-          />
+          {!isFinal && (
+            <PickWidget
+              gameSlug={game.slug}
+              homeTeam={game.homeTeam}
+              awayTeam={game.awayTeam}
+              homeTeamFull={game.homeTeamFull}
+              awayTeamFull={game.awayTeamFull}
+              gameStatus={game.status}
+            />
+          )}
 
-          <BoldPrediction
-            gameSlug={game.slug}
-            homeTeam={game.homeTeam}
-            awayTeam={game.awayTeam}
-            homeTeamFull={game.homeTeamFull}
-            awayTeamFull={game.awayTeamFull}
-            homeWinPct={prediction?.homeWinProbability ? prediction.homeWinProbability * 100 : undefined}
-            awayWinPct={prediction?.awayWinProbability ? prediction.awayWinProbability * 100 : undefined}
-          />
+          {!isFinal && (
+            <BoldPrediction
+              gameSlug={game.slug}
+              homeTeam={game.homeTeam}
+              awayTeam={game.awayTeam}
+              homeTeamFull={game.homeTeamFull}
+              awayTeamFull={game.awayTeamFull}
+              homeWinPct={prediction?.homeWinProbability ? prediction.homeWinProbability * 100 : undefined}
+              awayWinPct={prediction?.awayWinProbability ? prediction.awayWinProbability * 100 : undefined}
+            />
+          )}
 
           {prediction && (
             <div className="rounded-xl border border-border bg-card p-5 space-y-3">
